@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>KIB Dashboard 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --g:#1a5c38;--g2:#2d8a52;--gl:#e5f2ea;--gp:#f0f8f3;
+  --red:#dc2626;--amber:#ca8a04;--blue:#2471a3;--orange:#ea580c;
+  --bg:#f2f4f6;--card:#fff;--bdr:#e2e5ea;
+  --txt:#1a1e21;--muted:#5f6b7a;--light:#9aa3ae;
+  --hh:56px;--bnh:60px;--r:12px;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);font-size:15px;}
+/* ── HEADER ── */
+.hdr{height:var(--hh);background:var(--g);color:#fff;display:flex;align-items:center;padding:0 16px;gap:11px;position:fixed;top:0;left:0;right:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+.crest{width:34px;height:34px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--g);flex-shrink:0;}
+.ht{font-size:14px;font-weight:700;line-height:1.2;}
+.hs{font-size:10px;opacity:.7;}
+.hbk{margin-left:auto;background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:none;}
+.hbk.show{display:block;}
+/* ── SCREENS ── */
+.screen{position:fixed;top:var(--hh);left:0;right:0;bottom:var(--bnh);overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;padding:12px;}
+.screen.active{display:block;}
+/* ── BOTTOM NAV ── */
+.bnav{position:fixed;bottom:0;left:0;right:0;height:var(--bnh);background:var(--card);border-top:1px solid var(--bdr);display:flex;z-index:200;box-shadow:0 -1px 6px rgba(0,0,0,.08);}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:transparent;color:var(--light);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:6px 2px;transition:color .15s;}
+.bni.active{color:var(--g);}
+.bni svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+/* ── SQUAD LIST ── */
+.sq-search{background:var(--card);border-radius:var(--r);padding:10px 12px;margin-bottom:10px;box-shadow:var(--sh);display:flex;align-items:center;gap:8px;}
+.sq-search input{flex:1;border:none;outline:none;font-size:15px;background:transparent;color:var(--txt);}
+.pf-bar{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;-ms-overflow-style:none;scrollbar-width:none;}
+.pf-bar::-webkit-scrollbar{display:none;}
+.pfb{padding:6px 14px;border-radius:20px;border:1.5px solid var(--bdr);background:var(--card);font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);white-space:nowrap;flex-shrink:0;}
+.pfb.active{background:var(--g);color:#fff;border-color:var(--g);}
+.p-card{background:var(--card);border-radius:var(--r);padding:13px 14px;margin-bottom:8px;box-shadow:var(--sh);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-user-select:none;user-select:none;}
+.p-card:active{background:var(--gp);}
+.av{width:42px;height:42px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
+.p-info{flex:1;min-width:0;}
+.p-name{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.p-pos{font-size:11px;color:var(--muted);margin-top:1px;}
+.p-right{text-align:right;flex-shrink:0;}
+.p-eff{font-size:16px;font-weight:700;}
+.p-effl{font-size:10px;color:var(--muted);}
+.pos-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--light);padding:4px 4px 6px;margin-top:6px;}
+/* ── PLAYER PROFILE ── */
+.p-hdr{background:linear-gradient(135deg,var(--g) 0%,var(--g2) 100%);color:#fff;border-radius:var(--r);padding:16px;margin-bottom:11px;box-shadow:var(--sh);}
+.p-hdr-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.av-lg{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0;}
+.p-hdr h2{font-size:19px;font-weight:700;line-height:1.1;}
+.p-hdr-pos{font-size:11px;opacity:.8;margin-top:2px;}
+.p-pills{display:flex;gap:6px;flex-wrap:wrap;}
+.ppill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:3px 10px;font-size:11px;color:#fff;}
+/* ── TAB SCROLLER ── */
+.tab-bar{display:flex;gap:0;margin-bottom:12px;background:var(--card);border-radius:var(--r);padding:4px;box-shadow:var(--sh);overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab{padding:7px 13px;border:none;background:transparent;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);border-radius:8px;white-space:nowrap;flex-shrink:0;transition:all .15s;}
+.tab.active{background:var(--g);color:#fff;}
+/* ── CARDS & GRIDS ── */
+.card{background:var(--card);border-radius:var(--r);padding:14px;box-shadow:var(--sh);margin-bottom:11px;}
+.ct{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--light);margin-bottom:10px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:11px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:11px;}
+.met{background:var(--card);border-radius:var(--r);padding:12px 8px;box-shadow:var(--sh);text-align:center;}
+.met .v{font-size:24px;font-weight:700;line-height:1.1;}
+.met .l{font-size:10px;color:var(--muted);margin-top:3px;}
+/* ── BIG STAT ROW ── */
+.stat-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--bdr);}
+.stat-row:last-child{border-bottom:none;}
+.stat-lbl{font-size:13px;color:var(--muted);flex:1;}
+.stat-val{font-size:18px;font-weight:700;margin-right:8px;}
+.stat-diff{font-size:12px;font-weight:700;padding:2px 7px;border-radius:10px;}
+/* ── PROGRESS BAR ── */
+.pr{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
+.pl{font-size:12px;color:var(--muted);width:90px;flex-shrink:0;}
+.pt{flex:1;height:8px;background:var(--bg);border-radius:4px;overflow:hidden;}
+.pf2{height:100%;border-radius:4px;}
+.pv{font-size:12px;font-weight:700;width:32px;text-align:right;flex-shrink:0;}
+.ptg{font-size:11px;color:var(--light);width:38px;text-align:right;flex-shrink:0;}
+/* ── GAME ROWS ── */
+.gr{padding:11px 0;border-bottom:1px solid var(--bdr);}
+.gr:last-child{border-bottom:none;}
+.gr-opp{font-size:13px;font-weight:700;margin-bottom:5px;}
+.gr-stats{display:flex;gap:8px;flex-wrap:wrap;}
+.gs{background:var(--bg);border-radius:8px;padding:4px 9px;font-size:12px;color:var(--muted);}
+.gs strong{color:var(--txt);}
+/* ── BENCH TABLE ── */
+.br{margin-bottom:10px;}
+.bh{display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px;}
+/* ── GRADE CARDS ── */
+.grade-card{border-radius:var(--r);padding:14px;text-align:center;margin-bottom:11px;}
+.grade-big{font-size:28px;font-weight:800;line-height:1.1;}
+.grade-sub{font-size:13px;opacity:.85;margin-top:4px;}
+/* ── GRADE TABLE ── */
+.gtbl{width:100%;border-collapse:collapse;font-size:13px;}
+.gtbl td{padding:8px 10px;border-bottom:1px solid var(--bdr);}
+.gtbl tr:last-child td{border-bottom:none;}
+.gbadge{display:inline-block;padding:2px 9px;border-radius:9px;font-size:11px;font-weight:700;}
+/* ── OUTCOME PILLS ── */
+.op{display:inline-block;padding:2px 8px;border-radius:9px;font-size:11px;font-weight:600;margin:2px;}
+/* ── SHOT EFF GAUGE ── */
+.gauge-wrap{position:relative;height:14px;background:var(--bg);border-radius:7px;overflow:visible;margin-bottom:5px;}
+.gauge-fill{position:absolute;left:0;top:0;height:100%;border-radius:7px;overflow:hidden;}
+.gauge-mid{position:absolute;left:50%;top:-3px;width:2px;height:20px;background:#9ca3af;border-radius:1px;}
+/* ── FORM ── */
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px;}
+.fi{display:flex;flex-direction:column;gap:4px;}
+.fi label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
+.fi input{padding:9px 11px;border:1.5px solid var(--bdr);border-radius:8px;font-size:14px;background:var(--card);color:var(--txt);}
+.fi input:focus{outline:none;border-color:var(--g);}
+.btn{width:100%;padding:13px;border-radius:10px;border:none;cursor:pointer;font-size:15px;font-weight:700;}
+.btng{background:var(--g);color:#fff;margin-bottom:8px;}
+/* ── SECTION HEADER ── */
+.sh2{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--light);margin:14px 0 8px;}
+.cw{width:100%;position:relative;}
+/* ── SQUAD OVERVIEW CARDS ── */
+.sq-stat-card{background:var(--card);border-radius:var(--r);padding:13px;box-shadow:var(--sh);margin-bottom:8px;}
+.sq-stat-card .name{font-size:14px;font-weight:700;margin-bottom:6px;}
+.sq-mini-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.sqmg{background:var(--bg);border-radius:8px;padding:7px;text-align:center;}
+.sqmg .sv{font-size:16px;font-weight:700;line-height:1;}
+.sqmg .sl{font-size:9px;color:var(--light);margin-top:2px;text-transform:uppercase;letter-spacing:.4px;}
+/* dot colours */
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
+.dot.gk{background:#7c3aed;}.dot.def{background:#2563eb;}.dot.mid{background:#1a5c38;}.dot.fwd{background:#dc2626;}
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<div class="hdr">
+  <div class="crest">KIB</div>
+  <div><div class="ht">Kilmurry Ibrickane</div><div class="hs">Senior Football · Season 2026</div></div>
+  <button class="hbk" id="hbk" onclick="goBack()">← Back</button>
+</div>
+
+<!-- SCREENS -->
+<div class="screen active" id="scr-squad"></div>
+<div class="screen" id="scr-player"></div>
+
+<!-- BOTTOM NAV -->
+<div class="bnav">
+  <button class="bni active" id="bn-squad" onclick="showSquad()">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Squad
+  </button>
+  <button class="bni" id="bn-match" onclick="showPlayerTab('match')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    Match
+  </button>
+  <button class="bni" id="bn-shoot" onclick="showPlayerTab('shooting')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+    Shooting
+  </button>
+  <button class="bni" id="bn-sc" onclick="showPlayerTab('sc')">
+    <svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+    S&amp;C
+  </button>
+  <button class="bni" id="bn-bench" onclick="showPlayerTab('benchmarks')">
+    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Benchmarks
+  </button>
+</div>
+
+<script>
+
+const SAVG={tkl:2.37,nto:1.05,ttkl:35.5,tnto:15.75};
+const RMID=[{l:'Inter County',mn:0,mx:240,bg:'#14532d',tc:'#fff'},{l:'Senior',mn:241,mx:265,bg:'#16a34a',tc:'#fff'},{l:'Intermediate',mn:266,mx:290,bg:'#ca8a04',tc:'#fff'},{l:'Junior',mn:291,mx:330,bg:'#ea580c',tc:'#fff'},{l:'Junior B',mn:331,mx:9999,bg:'#dc2626',tc:'#fff'}];
+const R3UP=[{l:'Inter County',mn:0,mx:250,bg:'#14532d',tc:'#fff'},{l:'Senior',mn:251,mx:270,bg:'#16a34a',tc:'#fff'},{l:'Intermediate',mn:271,mx:300,bg:'#ca8a04',tc:'#fff'},{l:'Junior',mn:301,mx:318,bg:'#ea580c',tc:'#fff'},{l:'Junior B',mn:319,mx:9999,bg:'#dc2626',tc:'#fff'}];
+function rGrade(s,pos){if(!s)return null;const t=pos==='Middle 8'?RMID:R3UP;return t.find(g=>s>=g.mn&&s<=g.mx)||t[t.length-1];}
+const BM={cmj_gk:32,cmj_def:36,cmj_mid:38,cmj_fwd:38,sj_gk:30,sj_def:34,sj_mid:36,sj_fwd:36,broad_gk:220,broad_def:240,broad_mid:255,broad_fwd:250,chin_gk:8,chin_def:10,chin_mid:12,chin_fwd:10,bench:1.3,squat:1.5};
+function pk(pos){return pos==='Goalkeeper'?'gk':pos==='Inside 3 Defenders'?'def':pos==='Middle 8'?'mid':'fwd';}
+function ec(e){return e>=1.1?'#14532d':e>=1.0?'#16a34a':e>=0.85?'#ca8a04':e>=0.75?'#ea580c':'#dc2626';}
+function el(e){return e>=1.1?'Inter County':e>=1.0?'Senior':e>=0.85?'Intermediate':e>=0.75?'Junior':'Junior B';}
+const OC={"Point":"#15803d","2 Point":"#14532d","Goal":"#7f1d1d","Wide":"#b91c1c","Short":"#c2410c","Post":"#92400e","Blocked":"#374151","Saved":"#1d4ed8","45":"#1e40af"};
+function opills(o){if(!o||!Object.keys(o).length)return '<span style="color:var(--light);font-size:11px;">None</span>';return Object.entries(o).map(([k,v])=>`<span class="op" style="background:${OC[k]||'#555'};color:#fff;">${k}: ${v}</span>`).join('');}
+function shotGrade(e,total){if(e===null||e===undefined)return null;if(!total||total<3)return null;if(e>=1.10)return{l:'Inter County',bg:'#14532d',tc:'#fff'};if(e>=1.00)return{l:'Senior',bg:'#16a34a',tc:'#fff'};if(e>=0.85)return{l:'Intermediate',bg:'#ca8a04',tc:'#fff'};if(e>=0.75)return{l:'Junior',bg:'#ea580c',tc:'#fff'};if(e>=0.50)return{l:'Junior B',bg:'#dc2626',tc:'#fff'};return null;}
+function ini(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();}
+function dc(pos){return pos==='Goalkeeper'?'gk':pos==='Inside 3 Defenders'?'def':pos==='Middle 8'?'mid':'fwd';}
+const SD={"Aaron Considine":{"total":1,"pt_att":0,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":1,"actual":3,"xScore":1.9,"eff":1.58,"pt_out":{},"tw_out":{},"ga_out":{"Goal":1},"per_game":[{"opp":"Kilrush","pt_att":0,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":1,"total":1,"actual":3,"xScore":1.9,"eff":1.58}]},"Ajay Daly":{"total":1,"pt_att":0,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":0,"actual":0,"xScore":0.76,"eff":0.0,"pt_out":{},"tw_out":{},"ga_out":{"Saved":1},"per_game":[{"opp":"Kilrush","pt_att":0,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":0,"total":1,"actual":0,"xScore":0.76,"eff":0.0}]},"Cathal Talty":{"total":27,"pt_att":12,"pt_scored":8,"tw_att":12,"tw_scored":4,"ga_att":3,"ga_scored":1,"actual":22,"xScore":20.43,"eff":1.08,"pt_out":{"Point":7,"Short":2,"Wide":1,"Goal":1,"Blocked":1},"tw_out":{"Wide":5,"2 Point":4,"Short":2,"Blocked":1},"ga_out":{"Point":1,"Goal":1,"Wide":1},"per_game":[{"opp":"Ennistymon","pt_att":4,"pt_scored":2,"tw_att":1,"tw_scored":0,"ga_att":1,"ga_scored":0,"total":6,"actual":5,"xScore":3.55,"eff":1.41},{"opp":"St Breckans","pt_att":3,"pt_scored":2,"tw_att":4,"tw_scored":1,"ga_att":0,"ga_scored":0,"total":7,"actual":4,"xScore":5.09,"eff":0.79},{"opp":"Kilrush","pt_att":5,"pt_scored":4,"tw_att":5,"tw_scored":3,"ga_att":1,"ga_scored":1,"total":11,"actual":13,"xScore":8.03,"eff":1.62},{"opp":"Miltown Malbay","pt_att":0,"pt_scored":0,"tw_att":2,"tw_scored":0,"ga_att":1,"ga_scored":0,"total":3,"actual":0,"xScore":3.76,"eff":0.0}]},"Ciaran Morrissey":{"total":5,"pt_att":3,"pt_scored":2,"tw_att":1,"tw_scored":0,"ga_att":1,"ga_scored":0,"actual":2,"xScore":4.04,"eff":0.5,"pt_out":{"Point":2,"Wide":1},"tw_out":{"Short":1},"ga_out":{"45":1},"per_game":[{"opp":"Ennistymon","pt_att":1,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":0,"total":2,"actual":1,"xScore":2.19,"eff":0.46},{"opp":"St Breckans","pt_att":1,"pt_scored":1,"tw_att":1,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":2,"actual":1,"xScore":1.19,"eff":0.84},{"opp":"Kilrush","pt_att":1,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":1,"actual":0,"xScore":0.66,"eff":0.0}]},"Colin Considine":{"total":7,"pt_att":6,"pt_scored":2,"tw_att":1,"tw_scored":0,"ga_att":0,"ga_scored":0,"actual":2,"xScore":4.21,"eff":0.48,"pt_out":{"Short":3,"Point":2,"Blocked":1},"tw_out":{"Wide":1},"ga_out":{},"per_game":[{"opp":"Ennistymon","pt_att":1,"pt_scored":1,"tw_att":1,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":2,"actual":1,"xScore":1.01,"eff":0.99},{"opp":"Kilrush","pt_att":2,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":2,"actual":1,"xScore":1.11,"eff":0.9},{"opp":"Miltown Malbay","pt_att":3,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":3,"actual":0,"xScore":2.09,"eff":0.0}]},"Conor Burke":{"total":26,"pt_att":21,"pt_scored":9,"tw_att":0,"tw_scored":0,"ga_att":5,"ga_scored":1,"actual":14,"xScore":19.54,"eff":0.72,"pt_out":{"Point":8,"Wide":6,"Short":4,"Blocked":2,"Goal":1},"tw_out":{},"ga_out":{"Blocked":2,"Post":1,"Short":1,"Goal":1},"per_game":[{"opp":"St Breckans","pt_att":1,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":0,"total":2,"actual":0,"xScore":2.53,"eff":0.0},{"opp":"Kilrush","pt_att":11,"pt_scored":5,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":0,"total":12,"actual":5,"xScore":6.22,"eff":0.8},{"opp":"Miltown Malbay","pt_att":9,"pt_scored":4,"tw_att":0,"tw_scored":0,"ga_att":3,"ga_scored":1,"total":12,"actual":9,"xScore":10.79,"eff":0.83}]},"Diarmaid Comber":{"total":3,"pt_att":1,"pt_scored":0,"tw_att":1,"tw_scored":1,"ga_att":1,"ga_scored":0,"actual":2,"xScore":1.99,"eff":1.01,"pt_out":{"Wide":1},"tw_out":{"2 Point":1},"ga_out":{"Blocked":1},"per_game":[{"opp":"Ennistymon","pt_att":0,"pt_scored":0,"tw_att":1,"tw_scored":1,"ga_att":0,"ga_scored":0,"total":1,"actual":2,"xScore":0.61,"eff":3.28},{"opp":"St Breckans","pt_att":1,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":0,"total":2,"actual":0,"xScore":1.38,"eff":0.0}]},"Diarmuid King":{"total":3,"pt_att":2,"pt_scored":1,"tw_att":1,"tw_scored":0,"ga_att":0,"ga_scored":0,"actual":1,"xScore":1.49,"eff":0.67,"pt_out":{"Short":1,"Point":1},"tw_out":{"Short":1},"ga_out":{},"per_game":[{"opp":"Ennistymon","pt_att":1,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":1,"actual":1,"xScore":0.36,"eff":2.78},{"opp":"Miltown Malbay","pt_att":1,"pt_scored":0,"tw_att":1,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":2,"actual":0,"xScore":1.13,"eff":0.0}]},"Jason Cushen":{"total":4,"pt_att":3,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":1,"actual":3,"xScore":2.9,"eff":1.03,"pt_out":{"Wide":3},"tw_out":{},"ga_out":{"Goal":1},"per_game":[{"opp":"Ennistymon","pt_att":2,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":2,"actual":0,"xScore":0.99,"eff":0.0},{"opp":"St Breckans","pt_att":1,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":1,"actual":0,"xScore":0.53,"eff":0.0},{"opp":"Kilrush","pt_att":0,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":1,"total":1,"actual":3,"xScore":1.38,"eff":2.17}]},"Josh Moloney":{"total":3,"pt_att":3,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"actual":1,"xScore":1.74,"eff":0.57,"pt_out":{"Wide":2,"Point":1},"tw_out":{},"ga_out":{},"per_game":[{"opp":"Miltown Malbay","pt_att":3,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":3,"actual":1,"xScore":1.74,"eff":0.57}]},"Keelan Sexton":{"total":24,"pt_att":14,"pt_scored":7,"tw_att":9,"tw_scored":5,"ga_att":1,"ga_scored":0,"actual":17,"xScore":15.65,"eff":1.09,"pt_out":{"Point":7,"Short":3,"Wide":3,"Post":1},"tw_out":{"2 Point":5,"Wide":3,"Short":1},"ga_out":{"Saved":1},"per_game":[{"opp":"Ennistymon","pt_att":8,"pt_scored":3,"tw_att":2,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":10,"actual":3,"xScore":5.93,"eff":0.51},{"opp":"St Breckans","pt_att":4,"pt_scored":2,"tw_att":3,"tw_scored":3,"ga_att":0,"ga_scored":0,"total":7,"actual":8,"xScore":4.21,"eff":1.9},{"opp":"Kilrush","pt_att":2,"pt_scored":2,"tw_att":4,"tw_scored":2,"ga_att":1,"ga_scored":0,"total":7,"actual":6,"xScore":5.51,"eff":1.09}]},"Oisin Sexton":{"total":5,"pt_att":5,"pt_scored":2,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"actual":2,"xScore":2.4,"eff":0.83,"pt_out":{"Point":2,"Wide":2,"Short":1},"tw_out":{},"ga_out":{},"per_game":[{"opp":"Ennistymon","pt_att":2,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":2,"actual":1,"xScore":1.13,"eff":0.88},{"opp":"St Breckans","pt_att":3,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":3,"actual":1,"xScore":1.27,"eff":0.79}]},"Shane Hickey":{"total":8,"pt_att":5,"pt_scored":4,"tw_att":3,"tw_scored":0,"ga_att":0,"ga_scored":0,"actual":4,"xScore":4.61,"eff":0.87,"pt_out":{"Point":4,"Wide":1},"tw_out":{"Short":2,"Wide":1},"ga_out":{},"per_game":[{"opp":"Kilrush","pt_att":2,"pt_scored":2,"tw_att":2,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":4,"actual":2,"xScore":2.41,"eff":0.83},{"opp":"Miltown Malbay","pt_att":3,"pt_scored":2,"tw_att":1,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":4,"actual":2,"xScore":2.2,"eff":0.91}]},"Tomas Sexton":{"total":3,"pt_att":3,"pt_scored":2,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"actual":2,"xScore":2.13,"eff":0.94,"pt_out":{"Point":2,"45":1},"tw_out":{},"ga_out":{},"per_game":[{"opp":"Kilrush","pt_att":2,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":2,"actual":1,"xScore":1.14,"eff":0.88},{"opp":"Miltown Malbay","pt_att":1,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":1,"actual":1,"xScore":0.99,"eff":1.01}]}};
+const PLAYERS=[{"name":"Aaron Considine","position":"Inside 3 Forwards","games":2,"match":{"tackles":0,"neg_to":0,"own_ko":0,"opp_ko":0,"gen_free":0,"sc_free":0,"tpg":0.0,"npg":0.0},"sc":{"weight":73.4,"run_time":null,"run_secs":null,"cmj1":35,"cmj2":null,"slcmj1":null,"slcmj2":null,"sj1":34,"sj2":null,"broad1":null,"broad2":null,"chin1":9,"chin2":null,"bench1":55,"bench2":null,"bbw":0.75,"btgt":95.4,"squat1":null,"squat2":null,"sbw":null,"stgt":110.1}},{"name":"Ajay Daly","position":"Inside 3 Defenders","games":2,"match":{"tackles":2,"neg_to":0,"own_ko":0,"opp_ko":0,"gen_free":0,"sc_free":0,"tpg":1.0,"npg":0.0},"sc":{"weight":78.4,"run_time":"4:46","run_secs":286,"cmj1":38,"cmj2":42,"slcmj1":"L16/R17","slcmj2":"L18/R20","sj1":34,"sj2":39,"broad1":251,"broad2":270,"chin1":10,"chin2":12,"bench1":70,"bench2":80,"bbw":1.02,"btgt":101.9,"squat1":60,"squat2":90,"sbw":1.15,"stgt":117.6}},{"name":"Cathal Talty","position":"Inside 3 Forwards","games":4,"match":{"tackles":8,"neg_to":7,"own_ko":3,"opp_ko":1,"gen_free":0,"sc_free":0,"tpg":2.0,"npg":1.75},"sc":{"weight":85.5,"run_time":"4:45","run_secs":285,"cmj1":40,"cmj2":42,"slcmj1":"L19/R19","slcmj2":"L20/R20","sj1":41,"sj2":42,"broad1":270,"broad2":270,"chin1":13,"chin2":14,"bench1":90,"bench2":90,"bbw":1.05,"btgt":111.2,"squat1":60,"squat2":90,"sbw":1.05,"stgt":128.2}},{"name":"Ciaran Morrissey","position":"Middle 8","games":4,"match":{"tackles":5,"neg_to":4,"own_ko":2,"opp_ko":6,"gen_free":0,"sc_free":3,"tpg":1.25,"npg":1.0},"sc":{"weight":79,"run_time":"4:29","run_secs":269,"cmj1":35,"cmj2":36,"slcmj1":"L22/R18","slcmj2":"L21/R21","sj1":37,"sj2":37,"broad1":255,"broad2":255,"chin1":15,"chin2":17,"bench1":80,"bench2":80,"bbw":1.01,"btgt":102.7,"squat1":80,"squat2":100,"sbw":1.27,"stgt":118.5}},{"name":"Colin Considine","position":"Middle 8","games":4,"match":{"tackles":12,"neg_to":4,"own_ko":1,"opp_ko":6,"gen_free":1,"sc_free":1,"tpg":3.0,"npg":1.0},"sc":{"weight":74.3,"run_time":"4:43","run_secs":283,"cmj1":45,"cmj2":46,"slcmj1":"L22/R29","slcmj2":"L24/R29","sj1":45,"sj2":46,"broad1":230,"broad2":245,"chin1":13,"chin2":13,"bench1":90,"bench2":95,"bbw":1.28,"btgt":96.6,"squat1":100,"squat2":120,"sbw":1.62,"stgt":111.4}},{"name":"Colin O Neill","position":"Middle 8","games":3,"match":{"tackles":0,"neg_to":1,"own_ko":0,"opp_ko":0,"gen_free":0,"sc_free":0,"tpg":0.0,"npg":0.33},"sc":{"weight":89.3,"run_time":null,"run_secs":null,"cmj1":38,"cmj2":null,"slcmj1":"L18/R19","slcmj2":null,"sj1":40,"sj2":null,"broad1":252,"broad2":null,"chin1":6,"chin2":null,"bench1":70,"bench2":null,"bbw":0.78,"btgt":116.1,"squat1":90,"squat2":null,"sbw":1.01,"stgt":133.9}},{"name":"Conor Burke","position":"Inside 3 Forwards","games":3,"match":{"tackles":4,"neg_to":11,"own_ko":0,"opp_ko":1,"gen_free":2,"sc_free":0,"tpg":1.33,"npg":3.67},"sc":{"weight":76.5,"run_time":"4:47","run_secs":287,"cmj1":46,"cmj2":50,"slcmj1":"L23/R23","slcmj2":"L24/R24","sj1":40,"sj2":45,"broad1":255,"broad2":260,"chin1":10,"chin2":11,"bench1":65,"bench2":70,"bbw":0.92,"btgt":99.5,"squat1":80,"squat2":100,"sbw":1.31,"stgt":114.8}},{"name":"Conor Kearney","position":"Inside 3 Defenders","games":4,"match":{"tackles":11,"neg_to":1,"own_ko":6,"opp_ko":1,"gen_free":2,"sc_free":0,"tpg":2.75,"npg":0.25},"sc":{"weight":75,"run_time":"4:42","run_secs":282,"cmj1":42,"cmj2":35,"slcmj1":"L18/R20","slcmj2":"L17/R17","sj1":40,"sj2":35,"broad1":205,"broad2":210,"chin1":13,"chin2":14,"bench1":80,"bench2":85,"bbw":1.13,"btgt":97.5,"squat1":80,"squat2":100,"sbw":1.33,"stgt":112.5}},{"name":"Darragh Sexton","position":"Middle 8","games":3,"match":{"tackles":11,"neg_to":2,"own_ko":2,"opp_ko":2,"gen_free":2,"sc_free":0,"tpg":3.67,"npg":0.67},"sc":{"weight":73.5,"run_time":"4:26","run_secs":266,"cmj1":null,"cmj2":35,"slcmj1":null,"slcmj2":"L17/R17","sj1":null,"sj2":33,"broad1":null,"broad2":255,"chin1":null,"chin2":17,"bench1":null,"bench2":null,"bbw":null,"btgt":95.5,"squat1":null,"squat2":100,"sbw":1.36,"stgt":110.2}},{"name":"Darren Hickey","position":"Inside 3 Defenders","games":2,"match":{"tackles":2,"neg_to":1,"own_ko":3,"opp_ko":0,"gen_free":0,"sc_free":1,"tpg":1.0,"npg":0.5},"sc":{"weight":null,"run_time":"4:54","run_secs":294,"cmj1":null,"cmj2":null,"slcmj1":null,"slcmj2":null,"sj1":null,"sj2":null,"broad1":null,"broad2":null,"chin1":null,"chin2":null,"bench1":null,"bench2":null,"bbw":null,"btgt":null,"squat1":null,"squat2":null,"sbw":null,"stgt":null}},{"name":"Diarmuid King","position":"Middle 8","games":2,"match":{"tackles":9,"neg_to":2,"own_ko":3,"opp_ko":1,"gen_free":6,"sc_free":1,"tpg":4.5,"npg":1.0},"sc":{"weight":82,"run_time":"4:18","run_secs":258,"cmj1":45,"cmj2":45.5,"slcmj1":"L24/R26","slcmj2":"L26/R26","sj1":42,"sj2":43.5,"broad1":295,"broad2":275,"chin1":15,"chin2":18,"bench1":70,"bench2":75,"bbw":0.91,"btgt":106.6,"squat1":110,"squat2":null,"sbw":1.34,"stgt":123.0}},{"name":"Diarmaid Comber","position":"Middle 8","games":3,"match":{"tackles":10,"neg_to":1,"own_ko":4,"opp_ko":0,"gen_free":2,"sc_free":2,"tpg":3.33,"npg":0.33},"sc":{"weight":83.9,"run_time":"4:46","run_secs":286,"cmj1":45,"cmj2":45.5,"slcmj1":"L16/R20","slcmj2":"L17/R21","sj1":45,"sj2":45,"broad1":285,"broad2":285,"chin1":10,"chin2":11,"bench1":87.5,"bench2":87.5,"bbw":1.04,"btgt":109.1,"squat1":100,"squat2":110,"sbw":1.31,"stgt":125.9}},{"name":"Ian Mc Inerney","position":"Goalkeeper","games":4,"match":{"tackles":0,"neg_to":0,"own_ko":0,"opp_ko":0,"gen_free":0,"sc_free":0,"tpg":0.0,"npg":0.0},"sc":{"weight":105.5,"run_time":null,"run_secs":null,"cmj1":null,"cmj2":39,"slcmj1":null,"slcmj2":"L17/R17","sj1":null,"sj2":39,"broad1":null,"broad2":null,"chin1":null,"chin2":3,"bench1":null,"bench2":80,"bbw":0.76,"btgt":137.2,"squat1":null,"squat2":120,"sbw":1.14,"stgt":158.2}},{"name":"Jason Cushen","position":"Inside 3 Forwards","games":4,"match":{"tackles":5,"neg_to":4,"own_ko":0,"opp_ko":1,"gen_free":1,"sc_free":0,"tpg":1.25,"npg":1.0},"sc":{"weight":75,"run_time":"4:57","run_secs":297,"cmj1":35,"cmj2":35.5,"slcmj1":"L13/R14","slcmj2":"L15/R16","sj1":34,"sj2":34.5,"broad1":230,"broad2":235,"chin1":9,"chin2":9,"bench1":60,"bench2":65,"bbw":0.87,"btgt":97.5,"squat1":90,"squat2":100,"sbw":1.33,"stgt":112.5}},{"name":"Josh Moloney","position":"Middle 8","games":2,"match":{"tackles":4,"neg_to":4,"own_ko":1,"opp_ko":0,"gen_free":1,"sc_free":0,"tpg":2.0,"npg":2.0},"sc":{"weight":76,"run_time":"5:11","run_secs":311,"cmj1":44,"cmj2":null,"slcmj1":"L20/R17","slcmj2":null,"sj1":39,"sj2":null,"broad1":270,"broad2":null,"chin1":17,"chin2":null,"bench1":100,"bench2":null,"bbw":1.32,"btgt":98.8,"squat1":120,"squat2":null,"sbw":1.58,"stgt":114.0}},{"name":"Keelan Sexton","position":"Middle 8","games":3,"match":{"tackles":9,"neg_to":2,"own_ko":1,"opp_ko":5,"gen_free":2,"sc_free":0,"tpg":3.0,"npg":0.67},"sc":{"weight":null,"run_time":"4:25","run_secs":265,"cmj1":null,"cmj2":null,"slcmj1":null,"slcmj2":null,"sj1":null,"sj2":null,"broad1":null,"broad2":null,"chin1":null,"chin2":null,"bench1":null,"bench2":null,"bbw":null,"btgt":null,"squat1":null,"squat2":null,"sbw":null,"stgt":null}},{"name":"Leo Switzer","position":"Middle 8","games":1,"match":{"tackles":3,"neg_to":0,"own_ko":1,"opp_ko":0,"gen_free":0,"sc_free":0,"tpg":3.0,"npg":0.0},"sc":{"weight":74.7,"run_time":null,"run_secs":null,"cmj1":39,"cmj2":null,"slcmj1":"L14/R17","slcmj2":null,"sj1":34,"sj2":null,"broad1":245,"broad2":null,"chin1":11,"chin2":null,"bench1":85,"bench2":null,"bbw":1.14,"btgt":97.1,"squat1":60,"squat2":null,"sbw":0.8,"stgt":112.1}},{"name":"Maurice Donnellan","position":"Inside 3 Defenders","games":4,"match":{"tackles":14,"neg_to":3,"own_ko":2,"opp_ko":0,"gen_free":4,"sc_free":4,"tpg":3.5,"npg":0.75},"sc":{"weight":75.3,"run_time":"4:53","run_secs":293,"cmj1":37,"cmj2":37.5,"slcmj1":"L22/R24","slcmj2":"L23/R24","sj1":36.5,"sj2":36.5,"broad1":270,"broad2":270,"chin1":18,"chin2":13,"bench1":60,"bench2":55,"bbw":0.8,"btgt":97.9,"squat1":80,"squat2":90,"sbw":1.2,"stgt":112.9}},{"name":"Michael Comber","position":"Middle 8","games":4,"match":{"tackles":8,"neg_to":2,"own_ko":0,"opp_ko":1,"gen_free":4,"sc_free":0,"tpg":2.0,"npg":0.5},"sc":{"weight":82,"run_time":"4:56","run_secs":296,"cmj1":46,"cmj2":46.5,"slcmj1":"L18/R17","slcmj2":"L24/R19","sj1":42,"sj2":44,"broad1":287,"broad2":280,"chin1":15,"chin2":15,"bench1":95,"bench2":97.5,"bbw":1.19,"btgt":106.6,"squat1":60,"squat2":110,"sbw":1.34,"stgt":123.0}},{"name":"Oisin Sexton","position":"Middle 8","games":4,"match":{"tackles":4,"neg_to":2,"own_ko":2,"opp_ko":0,"gen_free":0,"sc_free":0,"tpg":1.0,"npg":0.5},"sc":{"weight":85.4,"run_time":"5:00","run_secs":300,"cmj1":34,"cmj2":36,"slcmj1":"L17/R17","slcmj2":"L20/R21","sj1":33,"sj2":37,"broad1":256,"broad2":255,"chin1":9,"chin2":9,"bench1":75,"bench2":80,"bbw":0.94,"btgt":111.0,"squat1":70,"squat2":90,"sbw":1.05,"stgt":128.1}},{"name":"Shane Hickey","position":"Middle 8","games":3,"match":{"tackles":10,"neg_to":6,"own_ko":0,"opp_ko":4,"gen_free":5,"sc_free":1,"tpg":3.33,"npg":2.0},"sc":{"weight":81.1,"run_time":"4:51","run_secs":291,"cmj1":31,"cmj2":35,"slcmj1":"L15/R15","slcmj2":"L16/R17","sj1":31,"sj2":35,"broad1":236,"broad2":235,"chin1":7,"chin2":9,"bench1":80,"bench2":80,"bbw":0.99,"btgt":105.4,"squat1":80,"squat2":80,"sbw":0.99,"stgt":121.6}},{"name":"Shay Gleeson","position":"Inside 3 Defenders","games":3,"match":{"tackles":2,"neg_to":0,"own_ko":2,"opp_ko":0,"gen_free":0,"sc_free":0,"tpg":0.67,"npg":0.0},"sc":{"weight":81,"run_time":"4:59","run_secs":299,"cmj1":29,"cmj2":32,"slcmj1":"L20/R17","slcmj2":"L21/R17","sj1":32,"sj2":34,"broad1":205,"broad2":213,"chin1":7,"chin2":9,"bench1":65,"bench2":70,"bbw":0.86,"btgt":105.3,"squat1":70,"squat2":80,"sbw":0.99,"stgt":121.5}},{"name":"Tom O Flaherthy","position":"Middle 8","games":4,"match":{"tackles":7,"neg_to":2,"own_ko":6,"opp_ko":2,"gen_free":2,"sc_free":0,"tpg":1.75,"npg":0.5},"sc":{"weight":75.8,"run_time":"4:20","run_secs":260,"cmj1":null,"cmj2":45,"slcmj1":null,"slcmj2":"L17/R17","sj1":null,"sj2":39,"broad1":null,"broad2":240,"chin1":null,"chin2":5,"bench1":null,"bench2":null,"bbw":null,"btgt":98.5,"squat1":null,"squat2":80,"sbw":1.06,"stgt":113.7}},{"name":"Tomas Sexton","position":"Goalkeeper","games":4,"match":{"tackles":0,"neg_to":1,"own_ko":0,"opp_ko":0,"gen_free":0,"sc_free":1,"tpg":0.0,"npg":0.25},"sc":{"weight":102.5,"run_time":"5:20","run_secs":320,"cmj1":31,"cmj2":32,"slcmj1":"L14/R14","slcmj2":"L17/R17","sj1":30,"sj2":32,"broad1":230,"broad2":230,"chin1":4,"chin2":5,"bench1":75,"bench2":77.5,"bbw":0.76,"btgt":133.2,"squat1":70,"squat2":75,"sbw":0.73,"stgt":153.8}}];
+const PG_MATCH={"Tomas Sexton":[{opp:"Ennistymon",t:0,n:1,ok:0,pk:0,gf:0,sf:0},{opp:"St Breckans",t:0,n:0,ok:0,pk:0,gf:0,sf:1},{opp:"Kilrush",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:0,n:0,ok:0,pk:0,gf:0,sf:0}],"Conor Kearney":[{opp:"Ennistymon",t:3,n:1,ok:1,pk:0,gf:0,sf:0},{opp:"St Breckans",t:3,n:0,ok:1,pk:1,gf:0,sf:0},{opp:"Kilrush",t:2,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:3,n:0,ok:4,pk:0,gf:2,sf:0}],"Maurice Donnellan":[{opp:"Ennistymon",t:7,n:2,ok:0,pk:0,gf:1,sf:0},{opp:"St Breckans",t:3,n:0,ok:1,pk:0,gf:0,sf:1},{opp:"Kilrush",t:3,n:0,ok:1,pk:0,gf:2,sf:0},{opp:"Miltown Malbay",t:1,n:1,ok:0,pk:0,gf:1,sf:3}],"Shay Gleeson":[{opp:"Ennistymon",t:2,n:0,ok:1,pk:0,gf:0,sf:0},{opp:"St Breckans",t:0,n:0,ok:1,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:0,n:0,ok:0,pk:0,gf:0,sf:0}],"Darragh Sexton":[{opp:"Ennistymon",t:4,n:0,ok:2,pk:1,gf:0,sf:0},{opp:"Kilrush",t:3,n:2,ok:0,pk:1,gf:0,sf:0},{opp:"Miltown Malbay",t:4,n:0,ok:0,pk:0,gf:2,sf:0}],"Ciaran Morrissey":[{opp:"Ennistymon",t:4,n:2,ok:0,pk:1,gf:0,sf:2},{opp:"St Breckans",t:1,n:0,ok:0,pk:1,gf:0,sf:1},{opp:"Kilrush",t:0,n:1,ok:1,pk:3,gf:0,sf:0},{opp:"Miltown Malbay",t:0,n:1,ok:1,pk:1,gf:0,sf:0}],"Diarmaid Comber":[{opp:"Ennistymon",t:6,n:0,ok:2,pk:0,gf:1,sf:0},{opp:"St Breckans",t:3,n:1,ok:2,pk:0,gf:1,sf:2},{opp:"Miltown Malbay",t:1,n:0,ok:0,pk:0,gf:0,sf:0}],"Michael Comber":[{opp:"Ennistymon",t:2,n:0,ok:0,pk:1,gf:1,sf:0},{opp:"St Breckans",t:0,n:0,ok:0,pk:0,gf:1,sf:0},{opp:"Kilrush",t:4,n:2,ok:0,pk:0,gf:1,sf:0},{opp:"Miltown Malbay",t:2,n:0,ok:0,pk:0,gf:1,sf:0}],"Diarmuid King":[{opp:"Ennistymon",t:5,n:2,ok:2,pk:0,gf:5,sf:0},{opp:"Miltown Malbay",t:4,n:0,ok:1,pk:1,gf:1,sf:1}],"Colin Considine":[{opp:"Ennistymon",t:2,n:2,ok:0,pk:3,gf:0,sf:1},{opp:"St Breckans",t:3,n:1,ok:0,pk:0,gf:0,sf:0},{opp:"Kilrush",t:6,n:0,ok:0,pk:1,gf:1,sf:0},{opp:"Miltown Malbay",t:1,n:1,ok:1,pk:2,gf:0,sf:0}],"Keelan Sexton":[{opp:"Ennistymon",t:1,n:1,ok:1,pk:2,gf:1,sf:0},{opp:"St Breckans",t:4,n:1,ok:0,pk:0,gf:0,sf:0},{opp:"Kilrush",t:4,n:0,ok:0,pk:3,gf:1,sf:0}],"Tom O Flaherthy":[{opp:"Ennistymon",t:2,n:0,ok:1,pk:0,gf:1,sf:0},{opp:"St Breckans",t:4,n:1,ok:2,pk:0,gf:0,sf:0},{opp:"Kilrush",t:1,n:0,ok:3,pk:2,gf:1,sf:0},{opp:"Miltown Malbay",t:0,n:1,ok:0,pk:0,gf:0,sf:0}],"Oisin Sexton":[{opp:"Ennistymon",t:2,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"St Breckans",t:2,n:1,ok:1,pk:0,gf:0,sf:0},{opp:"Kilrush",t:0,n:1,ok:1,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:0,n:0,ok:0,pk:0,gf:0,sf:0}],"Cathal Talty":[{opp:"Ennistymon",t:1,n:0,ok:1,pk:0,gf:0,sf:0},{opp:"St Breckans",t:3,n:2,ok:2,pk:1,gf:0,sf:0},{opp:"Kilrush",t:2,n:1,ok:0,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:2,n:4,ok:0,pk:0,gf:0,sf:0}],"Jason Cushen":[{opp:"Ennistymon",t:2,n:2,ok:0,pk:0,gf:0,sf:0},{opp:"St Breckans",t:1,n:0,ok:0,pk:1,gf:0,sf:0},{opp:"Kilrush",t:2,n:2,ok:0,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:0,n:0,ok:0,pk:0,gf:1,sf:0}],"Ian Mc Inerney":[{opp:"Ennistymon",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"St Breckans",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"Kilrush",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:0,n:0,ok:0,pk:0,gf:0,sf:0}],"Colin O Neill":[{opp:"Ennistymon",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"St Breckans",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"Kilrush",t:0,n:1,ok:0,pk:0,gf:0,sf:0}],"Shane Hickey":[{opp:"Ennistymon",t:4,n:2,ok:0,pk:0,gf:2,sf:1},{opp:"Kilrush",t:4,n:3,ok:0,pk:4,gf:2,sf:0},{opp:"Miltown Malbay",t:2,n:1,ok:0,pk:0,gf:1,sf:0}],"Aaron Considine":[{opp:"Ennistymon",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"Kilrush",t:0,n:0,ok:0,pk:0,gf:0,sf:0}],"Leo Switzer":[{opp:"St Breckans",t:3,n:0,ok:1,pk:0,gf:0,sf:0}],"Conor Burke":[{opp:"St Breckans",t:0,n:1,ok:0,pk:0,gf:0,sf:0},{opp:"Kilrush",t:4,n:4,ok:0,pk:1,gf:1,sf:0},{opp:"Miltown Malbay",t:0,n:6,ok:0,pk:0,gf:1,sf:0}],"Ajay Daly":[{opp:"St Breckans",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"Kilrush",t:2,n:0,ok:0,pk:0,gf:0,sf:0}],"Josh Moloney":[{opp:"Kilrush",t:1,n:3,ok:1,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:3,n:1,ok:0,pk:0,gf:1,sf:0}],"Darren Hickey":[{opp:"Kilrush",t:1,n:0,ok:1,pk:0,gf:0,sf:1},{opp:"Miltown Malbay",t:1,n:1,ok:2,pk:0,gf:0,sf:0}]};
+const PG_SHOTS={"Aaron Considine":[{"opp":"Kilrush","pt_att":0,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":1,"ga_sc":1,"total":1,"actual":3,"xs":1.9,"eff":1.58}],"Ajay Daly":[{"opp":"Kilrush","pt_att":0,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":1,"ga_sc":0,"total":1,"actual":0,"xs":0.76,"eff":0.0}],"Cathal Talty":[{"opp":"Ennistymon","pt_att":4,"pt_sc":2,"tw_att":1,"tw_sc":0,"ga_att":1,"ga_sc":0,"total":6,"actual":5,"xs":3.55,"eff":1.41},{"opp":"St Breckans","pt_att":3,"pt_sc":2,"tw_att":4,"tw_sc":1,"ga_att":0,"ga_sc":0,"total":7,"actual":4,"xs":5.09,"eff":0.79},{"opp":"Kilrush","pt_att":5,"pt_sc":4,"tw_att":5,"tw_sc":3,"ga_att":1,"ga_sc":1,"total":11,"actual":13,"xs":8.03,"eff":1.62},{"opp":"Miltown Malbay","pt_att":0,"pt_sc":0,"tw_att":2,"tw_sc":0,"ga_att":1,"ga_sc":0,"total":3,"actual":0,"xs":3.76,"eff":0.0}],"Ciaran Morrissey":[{"opp":"Ennistymon","pt_att":1,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":1,"ga_sc":0,"total":2,"actual":1,"xs":2.19,"eff":0.46},{"opp":"St Breckans","pt_att":1,"pt_sc":1,"tw_att":1,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":2,"actual":1,"xs":1.19,"eff":0.84},{"opp":"Kilrush","pt_att":1,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":1,"actual":0,"xs":0.66,"eff":0.0}],"Colin Considine":[{"opp":"Ennistymon","pt_att":1,"pt_sc":1,"tw_att":1,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":2,"actual":1,"xs":1.01,"eff":0.99},{"opp":"Kilrush","pt_att":2,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":2,"actual":1,"xs":1.11,"eff":0.9},{"opp":"Miltown Malbay","pt_att":3,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":3,"actual":0,"xs":2.09,"eff":0.0}],"Conor Burke":[{"opp":"St Breckans","pt_att":1,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":1,"ga_sc":0,"total":2,"actual":0,"xs":2.53,"eff":0.0},{"opp":"Kilrush","pt_att":11,"pt_sc":5,"tw_att":0,"tw_sc":0,"ga_att":1,"ga_sc":0,"total":12,"actual":5,"xs":6.22,"eff":0.8},{"opp":"Miltown Malbay","pt_att":9,"pt_sc":4,"tw_att":0,"tw_sc":0,"ga_att":3,"ga_sc":1,"total":12,"actual":9,"xs":10.79,"eff":0.83}],"Diarmaid Comber":[{"opp":"Ennistymon","pt_att":0,"pt_sc":0,"tw_att":1,"tw_sc":1,"ga_att":0,"ga_sc":0,"total":1,"actual":2,"xs":0.61,"eff":3.28},{"opp":"St Breckans","pt_att":1,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":1,"ga_sc":0,"total":2,"actual":0,"xs":1.38,"eff":0.0}],"Diarmuid King":[{"opp":"Ennistymon","pt_att":1,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":1,"actual":1,"xs":0.36,"eff":2.78},{"opp":"Miltown Malbay","pt_att":1,"pt_sc":0,"tw_att":1,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":2,"actual":0,"xs":1.13,"eff":0.0}],"Jason Cushen":[{"opp":"Ennistymon","pt_att":2,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":2,"actual":0,"xs":0.99,"eff":0.0},{"opp":"St Breckans","pt_att":1,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":1,"actual":0,"xs":0.53,"eff":0.0},{"opp":"Kilrush","pt_att":0,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":1,"ga_sc":1,"total":1,"actual":3,"xs":1.38,"eff":2.17}],"Josh Moloney":[{"opp":"Miltown Malbay","pt_att":3,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":3,"actual":1,"xs":1.74,"eff":0.57}],"Keelan Sexton":[{"opp":"Ennistymon","pt_att":8,"pt_sc":3,"tw_att":2,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":10,"actual":3,"xs":5.93,"eff":0.51},{"opp":"St Breckans","pt_att":4,"pt_sc":2,"tw_att":3,"tw_sc":3,"ga_att":0,"ga_sc":0,"total":7,"actual":8,"xs":4.21,"eff":1.9},{"opp":"Kilrush","pt_att":2,"pt_sc":2,"tw_att":4,"tw_sc":2,"ga_att":1,"ga_sc":0,"total":7,"actual":6,"xs":5.51,"eff":1.09}],"Oisin Sexton":[{"opp":"Ennistymon","pt_att":2,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":2,"actual":1,"xs":1.13,"eff":0.88},{"opp":"St Breckans","pt_att":3,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":3,"actual":1,"xs":1.27,"eff":0.79}],"Shane Hickey":[{"opp":"Kilrush","pt_att":2,"pt_sc":2,"tw_att":2,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":4,"actual":2,"xs":2.41,"eff":0.83},{"opp":"Miltown Malbay","pt_att":3,"pt_sc":2,"tw_att":1,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":4,"actual":2,"xs":2.2,"eff":0.91}],"Tomas Sexton":[{"opp":"Kilrush","pt_att":2,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":2,"actual":1,"xs":1.14,"eff":0.88},{"opp":"Miltown Malbay","pt_att":1,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":1,"actual":1,"xs":0.99,"eff":1.01}]};
+
+let AP=null,CT='overview',CH={},AF='All';
+function dch(){Object.values(CH).forEach(c=>{try{c.destroy();}catch(e){}});CH={};}
+function $id(id){return document.getElementById(id);}
+
+// ── SQUAD SCREEN ─────────────────────────────────────────────
+function showSquad(){
+  AP=null;CT='overview';
+  $id('scr-squad').classList.add('active');
+  $id('scr-player').classList.remove('active');
+  ['squad','match','shoot','sc','bench'].forEach(b=>$id('bn-'+b).classList.remove('active'));
+  $id('bn-squad').classList.add('active');
+  $id('hbk').classList.remove('show');
+  renderSquad();
+}
+function renderSquad(){
+  const pos=['Goalkeeper','Inside 3 Defenders','Middle 8','Inside 3 Forwards'];
+  const bp={};PLAYERS.forEach(p=>{(bp[p.position]||(bp[p.position]=[])).push(p);});
+  const filt=AF==='All'?null:AF;
+  let html=`<div class="sq-search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--light)" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" id="sq-inp" placeholder="Search players…" oninput="filterSearch(this.value)"></div>
+  <div class="pf-bar">
+    <button class="pfb ${AF==='All'?'active':''}" onclick="setFilter('All',this)">All</button>
+    <button class="pfb ${AF==='Goalkeeper'?'active':''}" onclick="setFilter('Goalkeeper',this)">GK</button>
+    <button class="pfb ${AF==='Inside 3 Defenders'?'active':''}" onclick="setFilter('Inside 3 Defenders',this)">Defenders</button>
+    <button class="pfb ${AF==='Middle 8'?'active':''}" onclick="setFilter('Middle 8',this)">Middle 8</button>
+    <button class="pfb ${AF==='Inside 3 Forwards'?'active':''}" onclick="setFilter('Inside 3 Forwards',this)">Forwards</button>
+  </div>`;
+  pos.forEach(p=>{
+    const pl=(bp[p]||[]).filter(x=>!filt||x.position===filt);
+    if(!pl.length) return;
+    const label={Goalkeeper:'Goalkeepers','Inside 3 Defenders':'Inside 3 Defenders','Middle 8':'Middle 8','Inside 3 Forwards':'Inside 3 Forwards'}[p];
+    html+=`<div class="pos-section"><span class="dot ${dc(p)}"></span>${label}</div>`;
+    pl.forEach(player=>{
+      const sd=SD[player.name];
+      const sg=sd?shotGrade(sd.eff,sd.total):null;
+      const rg=rGrade(player.sc.run_secs,player.position);
+      html+=`<div class="p-card" onclick="selPlayer('${player.name}')">
+        <div class="av" style="background:${p==='Goalkeeper'?'#7c3aed':p==='Inside 3 Defenders'?'#2563eb':p==='Middle 8'?'#1a5c38':'#dc2626'}">${ini(player.name)}</div>
+        <div class="p-info">
+          <div class="p-name">${player.name}</div>
+          <div class="p-pos">${player.games} games${rg?' · '+rg.l+' runner':''}</div>
+        </div>
+        <div class="p-right">
+          ${sd?`<div class="p-eff" style="color:${ec(sd.eff)}">${sd.eff.toFixed(2)}</div><div class="p-effl">${sg?sg.l:'shot eff'}</div>`:'<div class="p-effl" style="margin-top:4px;">No shots</div>'}
+        </div>
+      </div>`;
+    });
+  });
+  $id('scr-squad').innerHTML=html;
+}
+function setFilter(f,btn){AF=f;renderSquad();}
+function filterSearch(q){
+  const cards=document.querySelectorAll('.p-card');
+  cards.forEach(c=>{c.style.display=c.textContent.toLowerCase().includes(q.toLowerCase())?'flex':'none';});
+}
+
+// ── PLAYER SCREEN ─────────────────────────────────────────────
+function selPlayer(name){
+  AP=PLAYERS.find(p=>p.name===name);
+  $id('scr-squad').classList.remove('active');
+  $id('scr-player').classList.add('active');
+  ['squad','match','shoot','sc','bench'].forEach(b=>$id('bn-'+b).classList.remove('active'));
+  $id('bn-squad').classList.add('active');
+  $id('hbk').classList.add('show');
+  renderPlayerScreen('overview');
+}
+function goBack(){
+  $id('scr-squad').classList.add('active');
+  $id('scr-player').classList.remove('active');
+  $id('hbk').classList.remove('show');
+  $id('bn-squad').classList.add('active');
+}
+function showPlayerTab(tab){
+  if(!AP){showSquad();return;}
+  CT=tab;
+  const map={match:'match',shooting:'shoot',sc:'sc',benchmarks:'bench'};
+  ['squad','match','shoot','sc','bench'].forEach(b=>$id('bn-'+b).classList.remove('active'));
+  if(map[tab]) $id('bn-'+map[tab]).classList.add('active');
+  $id('scr-squad').classList.remove('active');
+  $id('scr-player').classList.add('active');
+  $id('hbk').classList.add('show');
+  renderPlayerScreen(tab);
+}
+function swTab(t,btn){
+  CT=t;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTabBody(t);
+}
+
+function renderPlayerScreen(tab){
+  dch();
+  const p=AP,s=p.sc,sd=SD[p.name];
+  const rg=rGrade(s.run_secs,p.position);
+  const sg=sd?shotGrade(sd.eff,sd.total):null;
+  const posCol=p.position==='Goalkeeper'?'#7c3aed':p.position==='Inside 3 Defenders'?'#2563eb':p.position==='Middle 8'?'#1a5c38':'#dc2626';
+  const tabs=['overview','match','shooting','sc','benchmarks'];
+  const tabLabels=['Overview','Match','Shooting','S&C','Benchmarks'];
+  const tabBar=tabs.map((t,i)=>`<button class="tab${tab===t?' active':''}" onclick="swTab('${t}',this)">${tabLabels[i]}</button>`).join('');
+  $id('scr-player').innerHTML=`
+    <div class="p-hdr">
+      <div class="p-hdr-top">
+        <div class="av-lg" style="background:${posCol}40;">${ini(p.name)}</div>
+        <div><h2>${p.name}</h2><div class="p-hdr-pos">${p.position} · ${p.games} games</div></div>
+      </div>
+      <div class="p-pills">
+        ${s.weight?`<span class="ppill">${s.weight}kg</span>`:''}
+        ${rg?`<span class="ppill" style="background:${rg.bg}40;border-color:${rg.bg}60;">${s.run_time} ${rg.l}</span>`:''}
+        ${sg?`<span class="ppill" style="background:${sg.bg}40;border-color:${sg.bg}60;">${sd.eff.toFixed(2)} ${sg.l}</span>`:''}
+      </div>
+    </div>
+    <div class="tab-bar">${tabBar}</div>
+    <div id="tb"></div>`;
+  renderTabBody(tab);
+}
+
+function renderTabBody(tab){
+  dch();
+  const p=AP,tb=$id('tb');
+  if(!tb) return;
+  if(tab==='overview') tOver(p,tb);
+  else if(tab==='match') tMatch(p,tb);
+  else if(tab==='shooting') tShoot(p,tb);
+  else if(tab==='sc') tSC(p,tb);
+  else if(tab==='benchmarks') tBench(p,tb);
+}
+
+// ── TAB: OVERVIEW ─────────────────────────────────────────────
+function tOver(p,tb){
+  const m=p.match,s=p.sc,sd=SD[p.name];
+  const td=m.tpg-SAVG.tkl,nd=m.npg-SAVG.nto;
+  const tCol=td>=0.2?'#16a34a':td<=-0.2?'#dc2626':'#ca8a04';
+  const nCol=nd<=-0.2?'#16a34a':nd>=0.2?'#dc2626':'#ca8a04';
+  const k=pk(p.position);
+  const cb=Math.max(s.cmj1||0,s.cmj2||0)||null;
+  const bb=Math.max(s.broad1||0,s.broad2||0)||null;
+  const rg=rGrade(s.run_secs,p.position);
+  tb.innerHTML=`
+    <div class="card">
+      <div class="ct">Tackles &amp; Turnovers</div>
+      <div class="stat-row">
+        <div class="stat-lbl">Tackles / game</div>
+        <div class="stat-val">${m.tpg.toFixed(2)}</div>
+        <div class="stat-diff" style="background:${tCol}20;color:${tCol};">${td>=0?'+':''}${td.toFixed(2)}</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-lbl">Neg. TOs / game</div>
+        <div class="stat-val">${m.npg.toFixed(2)}</div>
+        <div class="stat-diff" style="background:${nCol}20;color:${nCol};">${nd>=0?'+':''}${nd.toFixed(2)}</div>
+      </div>
+      <div style="font-size:11px;color:var(--light);margin-top:8px;padding-top:8px;border-top:1px solid var(--bdr);">Squad avg: ${SAVG.tkl} tkl/g · ${SAVG.nto} NTO/g (team ÷ 15)</div>
+    </div>
+    ${sd?`<div class="card">
+      <div class="ct">Shooting Snapshot</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="text-align:center;min-width:60px;">
+          <div style="font-size:30px;font-weight:800;color:${ec(sd.eff)}">${sd.eff.toFixed(2)}</div>
+          <div style="font-size:10px;color:var(--light);">${el(sd.eff)}</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:13px;color:var(--muted);margin-bottom:5px;">${sd.actual}pts from ${sd.total} shots · xS ${sd.xScore}</div>
+          <div style="display:flex;gap:10px;font-size:12px;">
+            <span style="color:#16a34a;font-weight:700;">${sd.pt_scored}/${sd.pt_att} <span style="color:var(--muted);font-weight:400;">1pt</span></span>
+            <span style="color:#14532d;font-weight:700;">${sd.tw_scored}/${sd.tw_att} <span style="color:var(--muted);font-weight:400;">2pt</span></span>
+            <span style="color:#991b1b;font-weight:700;">${sd.ga_scored}/${sd.ga_att} <span style="color:var(--muted);font-weight:400;">goals</span></span>
+          </div>
+        </div>
+      </div>
+    </div>`:''}
+    <div class="card">
+      <div class="ct">S&amp;C Snapshot</div>
+      ${rg?`<div style="background:${rg.bg};color:${rg.tc};border-radius:8px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;"><strong>${rg.l}</strong><span>${s.run_time} · 1.2km</span></div>`:''}
+      <div class="pr"><div class="pl">CMJ best</div><div class="pt"><div class="pf2" style="width:${cb?Math.min(cb/65*100,100):0}%;background:#2d8a52;"></div></div><div class="pv">${cb||'—'}</div><div class="ptg">/${BM['cmj_'+k]}</div></div>
+      <div class="pr"><div class="pl">Broad Jump</div><div class="pt"><div class="pf2" style="width:${bb?Math.min(bb/320*100,100):0}%;background:var(--blue);"></div></div><div class="pv">${bb||'—'}</div><div class="ptg">/${BM['broad_'+k]}</div></div>
+      <div class="pr"><div class="pl">Bench/BW</div><div class="pt"><div class="pf2" style="width:${s.bbw?Math.min(s.bbw/2*100,100):0}%;background:${s.bbw>=1.3?'#16a34a':'#ca8a04'};"></div></div><div class="pv">${s.bbw||'—'}</div><div class="ptg">/1.3</div></div>
+      <div class="pr"><div class="pl">Squat/BW</div><div class="pt"><div class="pf2" style="width:${s.sbw?Math.min(s.sbw/2.5*100,100):0}%;background:${s.sbw>=1.5?'#16a34a':'#ca8a04'};"></div></div><div class="pv">${s.sbw||'—'}</div><div class="ptg">/1.5</div></div>
+    </div>`;
+}
+
+// ── TAB: MATCH ────────────────────────────────────────────────
+function tMatch(p,tb){
+  const m=p.match;
+  const pgM=PG_MATCH[p.name]||[];
+  const pgS=PG_SHOTS[p.name]||[];
+  const opps=['Ennistymon','St Breckans','Kilrush','Miltown Malbay'];
+  const gameCards=opps.map(opp=>{
+    const md=pgM.find(g=>g.opp===opp);
+    const sd=pgS.find(g=>g.opp===opp);
+    if(!md&&!sd) return '';
+    const sg=sd&&sd.eff>0?shotGrade(sd.eff,sd.total):null;
+    return `<div class="card" style="margin-bottom:9px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-size:15px;font-weight:700;">v ${opp}</div>
+        ${sd&&sd.eff>0&&sg?`<span style="background:${sg.bg};color:${sg.tc};padding:2px 9px;border-radius:9px;font-size:11px;font-weight:700;">${sd.eff.toFixed(2)} ${sg.l}</span>`:''}
+      </div>
+      ${md?`<div class="gr-stats" style="margin-bottom:${sd?'8px':'0'};">
+        <div class="gs"><strong>${md.t}</strong> tackles</div>
+        <div class="gs" style="${md.n>=3?'background:#fee2e2;':''}"><strong style="${md.n>=3?'color:#dc2626;':''}">${md.n}</strong> neg TO</div>
+        <div class="gs"><strong>${md.ok}</strong> own KO</div>
+        <div class="gs"><strong>${md.pk}</strong> opp KO</div>
+        <div class="gs"><strong>${md.gf}</strong> gen free</div>
+        <div class="gs"><strong>${md.sf||0}</strong> sc free</div>
+      </div>`:''}
+      ${sd?`<div style="background:var(--bg);border-radius:8px;padding:8px 10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        ${sd.pt_att>0?`<span style="font-size:12px;"><span style="color:#16a34a;font-weight:700;">${sd.pt_sc}/${sd.pt_att}</span> <span style="color:var(--muted);">1pt</span></span>`:''}
+        ${sd.tw_att>0?`<span style="font-size:12px;"><span style="color:#14532d;font-weight:700;">${sd.tw_sc}/${sd.tw_att}</span> <span style="color:var(--muted);">2pt</span></span>`:''}
+        ${sd.ga_att>0?`<span style="font-size:12px;"><span style="color:#991b1b;font-weight:700;">${sd.ga_sc}/${sd.ga_att}</span> <span style="color:var(--muted);">goals</span></span>`:''}
+        ${sd.actual>0?`<span style="font-size:12px;margin-left:auto;font-weight:700;">${sd.actual}pts</span>`:''}
+      </div>`:''}
+    </div>`;
+  }).filter(Boolean).join('');
+  tb.innerHTML=`
+    <div class="g3" style="margin-bottom:11px;">
+      <div class="met"><div class="v">${m.tackles}</div><div class="l">Tackles</div></div>
+      <div class="met"><div class="v">${m.neg_to}</div><div class="l">Neg TO</div></div>
+      <div class="met"><div class="v">${m.own_ko}</div><div class="l">Own KO</div></div>
+    </div>
+    <div class="g2" style="margin-bottom:11px;">
+      <div class="met"><div class="v">${m.opp_ko}</div><div class="l">Opp KO</div></div>
+      <div class="met"><div class="v">${m.gen_free}</div><div class="l">Gen Free</div></div>
+      <div class="met"><div class="v">${m.sc_free||0}</div><div class="l">Sc Free</div></div>
+    </div>
+    <div class="sh2">Game by Game</div>
+    ${gameCards||'<div class="card" style="color:var(--light);text-align:center;padding:20px;">No per-game data</div>'}`;
+}
+
+// ── TAB: SHOOTING ─────────────────────────────────────────────
+function tShoot(p,tb){
+  dch();
+  const sd=SD[p.name];
+  if(!sd||sd.total===0){tb.innerHTML='<div class="card" style="text-align:center;padding:40px 20px;color:var(--muted);">🎯<br><br>No shot data recorded</div>';return;}
+  const ptC=sd.pt_att>0?Math.round(sd.pt_scored/sd.pt_att*100):0;
+  const twC=sd.tw_att>0?Math.round(sd.tw_scored/sd.tw_att*100):0;
+  const gaC=sd.ga_att>0?Math.round(sd.ga_scored/sd.ga_att*100):0;
+  const sg=shotGrade(sd.eff,sd?sd.total:0);
+  const pgRows=sd.per_game.map(g=>{
+    const gsg=g.eff>0?shotGrade(g.eff):null;
+    return `<div class="gr">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+        <div class="gr-opp" style="margin:0;">v ${g.opp}</div>
+        ${gsg&&g.eff>0?`<span style="background:${gsg.bg};color:${gsg.tc};padding:1px 8px;border-radius:8px;font-size:11px;font-weight:700;">${g.eff.toFixed(2)}</span>`:''}
+      </div>
+      <div class="gr-stats">
+        ${g.pt_att>0?`<div class="gs"><span style="color:#16a34a;font-weight:700;">${g.pt_sc}/${g.pt_att}</span> 1pt</div>`:''}
+        ${g.tw_att>0?`<div class="gs"><span style="color:#14532d;font-weight:700;">${g.tw_sc}/${g.tw_att}</span> 2pt</div>`:''}
+        ${g.ga_att>0?`<div class="gs"><span style="color:#991b1b;font-weight:700;">${g.ga_sc}/${g.ga_att}</span> goal</div>`:''}
+        ${g.actual>0?`<div class="gs"><strong>${g.actual}</strong> pts</div>`:''}
+        <div class="gs">xS <strong>${g.xs}</strong></div>
+      </div>
+    </div>`;
+  }).join('');
+  tb.innerHTML=`
+    <div class="g2">
+      <div class="met"><div class="v">${sd.total}</div><div class="l">Shots</div></div>
+      <div class="met"><div class="v">${sd.actual}<span style="font-size:13px;color:var(--muted);"> pts</span></div><div class="l">Scored</div></div>
+    </div>
+    <div class="g2">
+      <div class="met"><div class="v" style="font-size:18px;color:var(--muted);">${sd.xScore}</div><div class="l">xScore</div></div>
+      <div class="met"><div class="v" style="color:${ec(sd.eff)};font-size:22px;">${sd.eff.toFixed(2)}</div><div class="l">${sg?sg.l:'Efficiency'}</div></div>
+    </div>
+    ${sg?`<div style="background:${sg.bg};color:${sg.tc};border-radius:var(--r);padding:12px 16px;text-align:center;margin-bottom:11px;"><div style="font-size:20px;font-weight:800;">${sg.l}</div><div style="font-size:12px;opacity:.85;margin-top:2px;">Efficiency ${sd.eff.toFixed(2)} · ${sd.actual}pts from ${sd.total} shots</div></div>`:''}
+    <div class="card">
+      <div style="display:flex;gap:6px;margin-bottom:11px;">
+        <div style="flex:1;background:var(--bg);border-radius:10px;padding:11px;text-align:center;">
+          <div style="font-size:18px;font-weight:700;color:#16a34a;">${sd.pt_scored}/${sd.pt_att}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">1pt · ${ptC}%</div>
+          ${sd.pt_att>0?`<div style="height:5px;background:var(--bdr);border-radius:3px;margin-top:6px;overflow:hidden;"><div style="height:100%;width:${ptC}%;background:#16a34a;border-radius:3px;"></div></div>`:''}
+        </div>
+        <div style="flex:1;background:var(--bg);border-radius:10px;padding:11px;text-align:center;">
+          <div style="font-size:18px;font-weight:700;color:#14532d;">${sd.tw_scored}/${sd.tw_att}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">2pt · ${twC}%</div>
+          ${sd.tw_att>0?`<div style="height:5px;background:var(--bdr);border-radius:3px;margin-top:6px;overflow:hidden;"><div style="height:100%;width:${twC}%;background:#14532d;border-radius:3px;"></div></div>`:''}
+        </div>
+        <div style="flex:1;background:var(--bg);border-radius:10px;padding:11px;text-align:center;">
+          <div style="font-size:18px;font-weight:700;color:#991b1b;">${sd.ga_scored}/${sd.ga_att}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Goals · ${gaC}%</div>
+          ${sd.ga_att>0?`<div style="height:5px;background:var(--bdr);border-radius:3px;margin-top:6px;overflow:hidden;"><div style="height:100%;width:${gaC}%;background:#dc2626;border-radius:3px;"></div></div>`:''}
+        </div>
+      </div>
+      <div class="ct">Outcomes — 1pt</div><div style="margin-bottom:8px;">${opills(sd.pt_out)}</div>
+      ${sd.tw_att>0?`<div class="ct">Outcomes — 2pt</div><div style="margin-bottom:8px;">${opills(sd.tw_out)}</div>`:''}
+      ${sd.ga_att>0?`<div class="ct">Outcomes — Goals</div><div>${opills(sd.ga_out)}</div>`:''}
+    </div>
+    <div class="card">
+      <div class="ct">Shot Mix</div>
+      <div class="cw" style="height:160px;"><canvas id="ch-mix"></canvas></div>
+    </div>
+    <div class="card"><div class="ct">Game by Game</div>${pgRows}</div>`;
+  setTimeout(()=>{
+    const ctx=$id('ch-mix');
+    if(!ctx)return;
+    const vd=[{v:sd.pt_att,l:'1pt',c:'#16a34a'},{v:sd.tw_att,l:'2pt',c:'#14532d'},{v:sd.ga_att,l:'Goal',c:'#dc2626'}].filter(x=>x.v>0);
+    CH['mix']=new Chart(ctx,{type:'doughnut',data:{labels:vd.map(x=>x.l),datasets:[{data:vd.map(x=>x.v),backgroundColor:vd.map(x=>x.c),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'right',labels:{font:{size:12},boxWidth:14}}}}});
+  },80);
+}
+
+// ── TAB: S&C ──────────────────────────────────────────────────
+function tSC(p,tb){
+  const s=p.sc,rg=rGrade(s.run_secs,p.position);
+  const cb=Math.max(s.cmj1||0,s.cmj2||0)||null,sj=Math.max(s.sj1||0,s.sj2||0)||null;
+  tb.innerHTML=`
+    <div class="g3">
+      <div class="met"><div class="v">${s.weight||'—'}</div><div class="l">kg</div></div>
+      <div class="met">${rg?`<div style="background:${rg.bg};color:${rg.tc};border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;margin-bottom:3px;">${rg.l}</div>`:''}<div class="v" style="font-size:16px;">${s.run_time||'—'}</div><div class="l">1.2km</div></div>
+      <div class="met"><div class="v">${s.chin2||s.chin1||'—'}</div><div class="l">Chin Ups</div></div>
+    </div>
+    <div class="card">
+      <div class="ct">Jump Tests (cm) — Test 1 → Test 2</div>
+      <div class="cw" style="height:180px;"><canvas id="ch-jmp"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">Broad Jump (cm)</div>
+      ${s.broad1?`<div class="br"><div class="bh"><span>Test 1</span><strong>${s.broad1}cm</strong></div><div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${Math.min(s.broad1/320*100,100)}%;background:var(--blue);border-radius:4px;"></div></div></div>`:''}
+      ${s.broad2?`<div class="br"><div class="bh"><span>Test 2</span><strong>${s.broad2}cm</strong></div><div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${Math.min(s.broad2/320*100,100)}%;background:#16a34a;border-radius:4px;"></div></div></div>`:''}
+      ${s.broad1&&s.broad2?`<div style="font-size:13px;margin-top:3px;color:${s.broad2>s.broad1?'#16a34a':'#dc2626'};font-weight:700;">${s.broad2>s.broad1?'▲ +':'▼ '}${s.broad2-s.broad1}cm</div>`:''}
+      ${!s.broad1&&!s.broad2?'<div style="color:var(--light);">No data</div>':''}
+    </div>
+    ${s.slcmj1||s.slcmj2?`<div class="card"><div class="ct">SLCMJ</div>${s.slcmj1?`<div style="margin-bottom:5px;font-size:13px;">Test 1: <strong>${s.slcmj1}</strong></div>`:''} ${s.slcmj2?`<div style="font-size:13px;">Test 2: <strong>${s.slcmj2}</strong></div>`:''}</div>`:''}
+    <div class="card">
+      <div class="ct">Bench Press</div>
+      ${s.bench1?`<div class="br"><div class="bh"><span>Test 1</span><strong>${s.bench1}kg</strong></div><div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${Math.min(s.bench1/150*100,100)}%;background:var(--blue);border-radius:4px;"></div></div></div>`:''}
+      ${s.bench2?`<div class="br"><div class="bh"><span>Test 2</span><strong>${s.bench2}kg</strong></div><div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${Math.min(s.bench2/150*100,100)}%;background:#16a34a;border-radius:4px;"></div></div></div>`:''}
+      ${s.bbw?`<div style="font-size:13px;margin-top:4px;">BW Ratio: <strong style="color:${s.bbw>=1.3?'#16a34a':'#ca8a04'}">${s.bbw}</strong> <span style="color:var(--light);">target 1.3× = ${s.btgt}kg</span></div>`:''}
+      ${!s.bench1&&!s.bench2?'<div style="color:var(--light);">No data</div>':''}
+    </div>
+    <div class="card">
+      <div class="ct">Front Squat</div>
+      ${s.squat1?`<div class="br"><div class="bh"><span>Test 1</span><strong>${s.squat1}kg</strong></div><div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${Math.min(s.squat1/180*100,100)}%;background:var(--blue);border-radius:4px;"></div></div></div>`:''}
+      ${s.squat2?`<div class="br"><div class="bh"><span>Test 2</span><strong>${s.squat2}kg</strong></div><div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${Math.min(s.squat2/180*100,100)}%;background:#16a34a;border-radius:4px;"></div></div></div>`:''}
+      ${s.sbw?`<div style="font-size:13px;margin-top:4px;">BW Ratio: <strong style="color:${s.sbw>=1.5?'#16a34a':'#ca8a04'}">${s.sbw}</strong> <span style="color:var(--light);">target 1.5× = ${s.stgt}kg</span></div>`:''}
+      ${!s.squat1&&!s.squat2?'<div style="color:var(--light);">No data</div>':''}
+    </div>`;
+  setTimeout(()=>{
+    const ctx=$id('ch-jmp');
+    if(ctx){CH['jmp']=new Chart(ctx,{type:'bar',data:{labels:['CMJ','SJ'],datasets:[{label:'Test 1',data:[s.cmj1||0,s.sj1||0],backgroundColor:'#2563eb',borderRadius:5},{label:'Test 2',data:[s.cmj2||0,s.sj2||0],backgroundColor:'#16a34a',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,max:65}},plugins:{legend:{position:'bottom',labels:{font:{size:11}}}}}});}
+  },80);
+}
+
+// ── TAB: BENCHMARKS ───────────────────────────────────────────
+function tBench(p,tb){
+  const s=p.sc,k=pk(p.position),rg=rGrade(s.run_secs,p.position);
+  const sd=SD[p.name];
+  const sg=sd?shotGrade(sd.eff,sd.total):null;
+  const cb=Math.max(s.cmj1||0,s.cmj2||0)||null,sj=Math.max(s.sj1||0,s.sj2||0)||null;
+  const bj=Math.max(s.broad1||0,s.broad2||0)||null,ch=Math.max(s.chin1||0,s.chin2||0)||null;
+  const SHOT_GRADES=[{l:'Inter County',mn:1.10,mx:1.50,bg:'#14532d',tc:'#fff'},{l:'Senior',mn:1.00,mx:1.09,bg:'#16a34a',tc:'#fff'},{l:'Intermediate',mn:0.85,mx:0.99,bg:'#ca8a04',tc:'#fff'},{l:'Junior',mn:0.75,mx:0.84,bg:'#ea580c',tc:'#fff'},{l:'Junior B',mn:0.50,mx:0.74,bg:'#dc2626',tc:'#fff'}];
+  const RUN_GT=p.position==='Middle 8'?RMID:R3UP;
+  const metrics=[{l:'CMJ (cm)',v:cb,t:BM['cmj_'+k]},{l:'SJ (cm)',v:sj,t:BM['sj_'+k]},{l:'Broad Jump',v:bj,t:BM['broad_'+k]},{l:'Chin Ups',v:ch,t:BM['chin_'+k]},{l:'Bench/BW',v:s.bbw,t:1.3},{l:'Squat/BW',v:s.sbw,t:1.5}];
+  const met=metrics.filter(m=>m.v&&m.v>=m.t).length,tested=metrics.filter(m=>m.v).length;
+  const mRows=metrics.map(m=>{
+    const ok=m.v&&m.v>=m.t;const col=ok?'#16a34a':m.v?'#ca8a04':'#9ca3af';
+    return `<div class="pr"><div class="pl" style="font-size:11px;">${m.l}</div><div class="pt"><div class="pf2" style="width:${m.v?Math.min(m.v/m.t*100,100):0}%;background:${col};"></div></div><div class="pv" style="font-size:11px;color:${col};">${m.v||'—'}</div><div class="ptg">/&nbsp;${m.t}</div></div>`;
+  }).join('');
+  const effVal = sd ? sd.eff : null;
+  tb.innerHTML=`
+    <div class="sh2">Shooting Efficiency Grade</div>
+    ${sg ? `<div class="grade-card" style="background:${sg.bg};color:${sg.tc};margin-bottom:11px;"><div class="grade-big">${sg.l}</div><div class="grade-sub">Eff ${effVal.toFixed(2)} · ${sd.actual}pts from ${sd.total} shots · xS ${sd.xScore}</div></div>` : `<div style="background:var(--bg);border-radius:var(--r);padding:12px 14px;margin-bottom:11px;color:var(--muted);font-size:13px;">${sd ? `Eff ${effVal.toFixed(2)} — ${sd.total} shots recorded` : 'No shooting data recorded'}</div>`}
+    <div class="card" style="margin-bottom:11px;">
+      <table class="gtbl">
+        <tr><td><span class="gbadge" style="background:#14532d;color:#fff;">Inter County</span></td><td style="color:var(--muted);font-size:12px;">1.10 – 1.50</td><td>${sg&&sg.l==='Inter County'?`<strong style="color:#14532d;">← ${effVal.toFixed(2)}</strong>`:''}</td></tr>
+        <tr><td><span class="gbadge" style="background:#16a34a;color:#fff;">Senior</span></td><td style="color:var(--muted);font-size:12px;">1.00 – 1.09</td><td>${sg&&sg.l==='Senior'?`<strong style="color:#16a34a;">← ${effVal.toFixed(2)}</strong>`:''}</td></tr>
+        <tr><td><span class="gbadge" style="background:#ca8a04;color:#fff;">Intermediate</span></td><td style="color:var(--muted);font-size:12px;">0.85 – 0.99</td><td>${sg&&sg.l==='Intermediate'?`<strong style="color:#ca8a04;">← ${effVal.toFixed(2)}</strong>`:''}</td></tr>
+        <tr><td><span class="gbadge" style="background:#ea580c;color:#fff;">Junior</span></td><td style="color:var(--muted);font-size:12px;">0.75 – 0.84</td><td>${sg&&sg.l==='Junior'?`<strong style="color:#ea580c;">← ${effVal.toFixed(2)}</strong>`:''}</td></tr>
+        <tr><td><span class="gbadge" style="background:#dc2626;color:#fff;">Junior B</span></td><td style="color:var(--muted);font-size:12px;">0.50 – 0.74</td><td>${sg&&sg.l==='Junior B'?`<strong style="color:#dc2626;">← ${effVal.toFixed(2)}</strong>`:''}</td></tr>
+      </table>
+      ${!sd?'<div style="color:var(--light);font-size:12px;padding-top:8px;">No shooting data recorded for this player</div>':''}
+    </div>
+    <div class="sh2">1.2km Run Grade (${p.position==='Middle 8'?'Middle 3rd':'3 Up/Back'})</div>
+    ${rg?`<div class="grade-card" style="background:${rg.bg};color:${rg.tc};"><div class="grade-big">${rg.l}</div><div class="grade-sub">${s.run_time} · ${p.position}</div></div>`:''}
+    <div class="card" style="margin-bottom:11px;">
+      <table class="gtbl">
+        ${RUN_GT.map(g=>{const isc=rg&&rg.l===g.l;const mn=g.mn===0?'Best':`${Math.floor(g.mn/60)}:${String(g.mn%60).padStart(2,'0')}`;const mx=g.mx===9999?'—':`${Math.floor(g.mx/60)}:${String(g.mx%60).padStart(2,'0')}`;return `<tr style="${isc?'font-weight:700;':''}"><td><span class="gbadge" style="background:${g.bg};color:${g.tc};">${g.l}</span></td><td style="font-size:12px;color:var(--muted);">${mn} – ${mx}</td><td>${isc?`<strong style="color:${g.bg};">← ${s.run_time}</strong>`:''}</td></tr>`;}).join('')}
+      </table>
+      ${!s.run_secs?'<div style="color:var(--light);font-size:12px;padding-top:8px;">No run time recorded</div>':''}
+    </div>
+    <div class="sh2">S&amp;C Benchmarks</div>
+    <div class="g3" style="margin-bottom:11px;">
+      <div class="met"><div class="v" style="color:#16a34a;">${met}</div><div class="l">Met</div></div>
+      <div class="met"><div class="v" style="color:#ca8a04;">${tested-met}</div><div class="l">Below</div></div>
+      <div class="met"><div class="v" style="color:var(--light);">${6-tested}</div><div class="l">Untested</div></div>
+    </div>
+    <div class="card" style="margin-bottom:11px;">
+      <div class="ct">${p.position} — vs Target</div>
+      ${mRows}
+    </div>
+    <div class="card">
+      <div class="ct">Radar — vs Position Standard</div>
+      <div class="cw" style="height:240px;"><canvas id="ch-rad"></canvas></div>
+    </div>`;
+  setTimeout(()=>{
+    const ctx=$id('ch-rad');
+    if(ctx){CH['rad']=new Chart(ctx,{type:'radar',data:{labels:['CMJ','SJ','Broad','Chin','Bench/BW','Squat/BW'],datasets:[{label:'Player',data:[cb?Math.round(cb/BM['cmj_'+k]*100):0,sj?Math.round(sj/BM['sj_'+k]*100):0,bj?Math.round(bj/BM['broad_'+k]*100):0,ch?Math.round(ch/BM['chin_'+k]*100):0,s.bbw?Math.round(s.bbw/1.3*100):0,s.sbw?Math.round(s.sbw/1.5*100):0],fill:true,backgroundColor:'rgba(22,163,74,.15)',borderColor:'#16a34a',pointRadius:4,pointBackgroundColor:'#16a34a'},{label:'Target',data:[100,100,100,100,100,100],fill:false,borderColor:'#ca8a04',borderDash:[5,5],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:130,ticks:{display:false},pointLabels:{font:{size:10}}}},plugins:{legend:{display:true,position:'bottom',labels:{font:{size:11}}}}}});}
+  },80);
+}
+
+showSquad();
+</script>
+</body>
+</html>

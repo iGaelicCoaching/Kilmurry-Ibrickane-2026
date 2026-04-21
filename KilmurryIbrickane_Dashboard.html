@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kilmurry Ibrickane GAA — Player Dashboard 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{--green:#1a5c38;--green2:#2d8a52;--gl:#e5f2ea;--gp:#f0f8f3;--gold:#b8860b;--red:#c0392b;--amber:#e67e22;--blue:#2471a3;--bg:#f4f5f7;--card:#fff;--border:#dde1e7;--text:#1a1e21;--muted:#5f6b7a;--light:#9aa3ae;--r:10px;--sh:0 1px 4px rgba(0,0,0,.07);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
+.hdr{background:var(--green);color:#fff;padding:0 22px;display:flex;align-items:center;gap:13px;height:56px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25);}
+.crest{width:36px;height:36px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:var(--green);flex-shrink:0;}
+.ht{font-size:15px;font-weight:600;}.hs{font-size:11px;opacity:.7;margin-top:1px;}
+.hr{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.bdg{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;padding:3px 9px;border-radius:14px;font-size:11px;}
+.lay{display:flex;height:calc(100vh - 56px);}
+.sb{width:212px;min-width:212px;background:var(--card);border-right:1px solid var(--border);overflow-y:auto;padding:10px 6px;}
+.mn{flex:1;overflow-y:auto;padding:16px 18px;}
+.sbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--light);padding:0 8px;margin:10px 0 5px;}
+.snav{padding:7px 10px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);transition:background .12s;}
+.snav:hover,.snav.active{background:var(--gp);color:var(--green);}
+.pf{display:flex;flex-wrap:wrap;gap:4px;padding:4px 8px 6px;}
+.pfb{padding:3px 8px;border-radius:12px;border:1px solid var(--border);background:transparent;font-size:11px;cursor:pointer;color:var(--muted);}
+.pfb.active{background:var(--green);color:#fff;border-color:var(--green);}
+.pi{padding:6px 10px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .12s;}
+.pi:hover{background:var(--gp);}.pi.active{background:var(--gl);color:var(--green);}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--border);}
+.dot.gk{background:#7c3aed;}.dot.def{background:#2563eb;}.dot.mid{background:#1a5c38;}.dot.fwd{background:#dc2626;}
+.pn{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pg{font-size:11px;color:var(--light);margin-left:auto;flex-shrink:0;}
+.tabs{display:flex;gap:1px;margin-bottom:14px;border-bottom:2px solid var(--border);}
+.tab{padding:7px 14px;border:none;background:transparent;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;}
+.tab.active{color:var(--green);border-bottom-color:var(--green);}
+.tab:hover:not(.active){color:var(--text);}
+.ph{background:var(--card);border-radius:var(--r);padding:14px 18px;margin-bottom:13px;box-shadow:var(--sh);display:flex;align-items:flex-start;gap:14px;}
+.av{width:50px;height:50px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;}
+.pi2 h2{font-size:18px;font-weight:600;margin-bottom:3px;}
+.ptag{display:inline-block;padding:2px 9px;border-radius:11px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+.ptag.Goalkeeper{background:#f3e8ff;color:#6b21a8;}.ptag.Inside3Defenders{background:#dbeafe;color:#1d4ed8;}.ptag.Middle8{background:#dcfce7;color:#15803d;}.ptag.Inside3Forwards{background:#fee2e2;color:#b91c1c;}
+.pills{display:flex;gap:7px;margin-top:7px;flex-wrap:wrap;}
+.pill{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:2px 9px;font-size:12px;color:var(--muted);}
+.pill strong{color:var(--text);}
+.g{display:grid;gap:11px;}.g2{grid-template-columns:1fr 1fr;}.g3{grid-template-columns:1fr 1fr 1fr;}.g4{grid-template-columns:1fr 1fr 1fr 1fr;}.g5{grid-template-columns:repeat(5,1fr);}
+.card{background:var(--card);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);}
+.ct{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--light);margin-bottom:10px;}
+.met{text-align:center;padding:11px 8px;}.met .v{font-size:25px;font-weight:700;line-height:1.1;}.met .l{font-size:11px;color:var(--muted);margin-top:3px;}
+.pr{display:flex;align-items:center;gap:7px;margin-bottom:8px;}.pl{font-size:12px;color:var(--muted);width:100px;flex-shrink:0;}.pt{flex:1;height:7px;background:var(--bg);border-radius:4px;overflow:hidden;}.pf2{height:100%;border-radius:4px;}.pv{font-size:12px;font-weight:600;width:34px;text-align:right;flex-shrink:0;}.ptg{font-size:11px;color:var(--light);width:42px;text-align:right;flex-shrink:0;}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{text-align:left;padding:6px 9px;font-size:10px;font-weight:700;color:var(--light);text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border);}
+.tbl td{padding:7px 9px;border-bottom:1px solid var(--border);}
+.tbl tr:last-child td{border-bottom:none;}.tbl tr:hover td{background:var(--bg);}
+.chip{display:inline-block;padding:2px 7px;border-radius:9px;font-size:11px;font-weight:600;}
+.cg{background:#dcfce7;color:#15803d;}.cr{background:#fee2e2;color:#b91c1c;}.ca{background:#fef3c7;color:#92400e;}.cgr{background:var(--bg);color:var(--muted);}
+.sg{color:#16a34a;font-weight:600;}.sw{color:var(--amber);font-weight:600;}.sb2{color:var(--red);font-weight:600;}.sn{color:var(--light);}
+.sh2{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--light);margin:14px 0 8px;}
+.cw{position:relative;width:100%;}
+.emp{text-align:center;padding:45px 20px;color:var(--muted);}
+.br{margin-bottom:11px;}
+.bh{display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;}
+.sqt{width:100%;border-collapse:collapse;font-size:13px;}
+.sqt th{background:var(--bg);padding:7px 9px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--light);text-align:left;border-bottom:1px solid var(--border);}
+.sqt td{padding:7px 9px;border-bottom:1px solid var(--border);}
+.sqt tr:hover td{background:var(--gp);cursor:pointer;}
+.op{display:inline-block;padding:2px 7px;border-radius:9px;font-size:11px;font-weight:600;margin:2px;}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.fi{display:flex;flex-direction:column;gap:3px;}
+.fi label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
+.fi input,.fi select{padding:6px 9px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card);color:var(--text);}
+.fi input:focus{outline:none;border-color:var(--green);}
+.btn{padding:7px 15px;border-radius:7px;border:none;cursor:pointer;font-size:13px;font-weight:600;}
+.btng{background:var(--green);color:#fff;}
+.rbd{padding:3px 9px;border-radius:11px;font-size:11px;font-weight:700;letter-spacing:.3px;}
+@media(max-width:860px){.sb{display:none;}.g4{grid-template-columns:1fr 1fr;}.g3{grid-template-columns:1fr 1fr;}}
+@media(max-width:540px){.g2,.g3,.g4,.g5{grid-template-columns:1fr;}.fg2{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="crest">KIB</div>
+  <div><div class="ht">Kilmurry Ibrickane GAA</div><div class="hs">Senior Football — Season 2026</div></div>
+  <div class="hr"><span class="bdg">4 games</span><span class="bdg" id="sqct"></span></div>
+</div>
+<div class="lay">
+  <div class="sb">
+    <div class="sbl">View</div>
+    <div class="snav active" id="nav-sq" onclick="showSquad()">📋 Squad Overview</div>
+    <div class="sbl" style="margin-top:10px;">Filter</div>
+    <div class="pf">
+      <button class="pfb active" onclick="filterPos('All',this)">All</button>
+      <button class="pfb" onclick="filterPos('Goalkeeper',this)">GK</button>
+      <button class="pfb" onclick="filterPos('Inside 3 Defenders',this)">Def</button>
+      <button class="pfb" onclick="filterPos('Middle 8',this)">Mid</button>
+      <button class="pfb" onclick="filterPos('Inside 3 Forwards',this)">Fwd</button>
+    </div>
+    <div class="sbl">Players</div>
+    <div id="plist"></div>
+  </div>
+  <div class="mn" id="main"></div>
+</div>
+<script>
+const SAVG={tkl:2.37,nto:1.05,ttkl:35.5,tnto:15.75};
+const RMID=[{l:'Inter County',mn:0,mx:240,bg:'#14532d',tc:'#fff'},{l:'Senior',mn:241,mx:265,bg:'#16a34a',tc:'#fff'},{l:'Intermediate',mn:266,mx:290,bg:'#ca8a04',tc:'#fff'},{l:'Junior',mn:291,mx:330,bg:'#ea580c',tc:'#fff'},{l:'Junior B',mn:331,mx:9999,bg:'#dc2626',tc:'#fff'}];
+const R3UP=[{l:'Inter County',mn:0,mx:250,bg:'#14532d',tc:'#fff'},{l:'Senior',mn:251,mx:270,bg:'#16a34a',tc:'#fff'},{l:'Intermediate',mn:271,mx:300,bg:'#ca8a04',tc:'#fff'},{l:'Junior',mn:301,mx:318,bg:'#ea580c',tc:'#fff'},{l:'Junior B',mn:319,mx:9999,bg:'#dc2626',tc:'#fff'}];
+function rGrade(secs,pos){if(!secs)return null;const t=pos==='Middle 8'?RMID:R3UP;return t.find(g=>secs>=g.mn&&secs<=g.mx)||t[t.length-1];}
+const BM={cmj_gk:32,cmj_def:36,cmj_mid:38,cmj_fwd:38,sj_gk:30,sj_def:34,sj_mid:36,sj_fwd:36,broad_gk:220,broad_def:240,broad_mid:255,broad_fwd:250,chin_gk:8,chin_def:10,chin_mid:12,chin_fwd:10,bench:1.3,squat:1.5};
+function pk(pos){return pos==='Goalkeeper'?'gk':pos==='Inside 3 Defenders'?'def':pos==='Middle 8'?'mid':'fwd';}
+
+const SD={"Aaron Considine":{"total":1,"pt_att":0,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":1,"actual":3,"xScore":1.9,"eff":1.58,"pt_out":{},"tw_out":{},"ga_out":{"Goal":1},"per_game":[{"opp":"Kilrush","pt_att":0,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":1,"total":1,"actual":3,"xScore":1.9,"eff":1.58}]},"Ajay Daly":{"total":1,"pt_att":0,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":0,"actual":0,"xScore":0.76,"eff":0.0,"pt_out":{},"tw_out":{},"ga_out":{"Saved":1},"per_game":[{"opp":"Kilrush","pt_att":0,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":0,"total":1,"actual":0,"xScore":0.76,"eff":0.0}]},"Cathal Talty":{"total":27,"pt_att":12,"pt_scored":8,"tw_att":12,"tw_scored":4,"ga_att":3,"ga_scored":1,"actual":22,"xScore":20.43,"eff":1.08,"pt_out":{"Point":7,"Short":2,"Wide":1,"Goal":1,"Blocked":1},"tw_out":{"Wide":5,"2 Point":4,"Short":2,"Blocked":1},"ga_out":{"Point":1,"Goal":1,"Wide":1},"per_game":[{"opp":"Ennistymon","pt_att":4,"pt_scored":2,"tw_att":1,"tw_scored":0,"ga_att":1,"ga_scored":0,"total":6,"actual":5,"xScore":3.55,"eff":1.41},{"opp":"St Breckans","pt_att":3,"pt_scored":2,"tw_att":4,"tw_scored":1,"ga_att":0,"ga_scored":0,"total":7,"actual":4,"xScore":5.09,"eff":0.79},{"opp":"Kilrush","pt_att":5,"pt_scored":4,"tw_att":5,"tw_scored":3,"ga_att":1,"ga_scored":1,"total":11,"actual":13,"xScore":8.03,"eff":1.62},{"opp":"Miltown Malbay","pt_att":0,"pt_scored":0,"tw_att":2,"tw_scored":0,"ga_att":1,"ga_scored":0,"total":3,"actual":0,"xScore":3.76,"eff":0.0}]},"Ciaran Morrissey":{"total":5,"pt_att":3,"pt_scored":2,"tw_att":1,"tw_scored":0,"ga_att":1,"ga_scored":0,"actual":2,"xScore":4.04,"eff":0.5,"pt_out":{"Point":2,"Wide":1},"tw_out":{"Short":1},"ga_out":{"45":1},"per_game":[{"opp":"Ennistymon","pt_att":1,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":0,"total":2,"actual":1,"xScore":2.19,"eff":0.46},{"opp":"St Breckans","pt_att":1,"pt_scored":1,"tw_att":1,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":2,"actual":1,"xScore":1.19,"eff":0.84},{"opp":"Kilrush","pt_att":1,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":1,"actual":0,"xScore":0.66,"eff":0.0}]},"Colin Considine":{"total":7,"pt_att":6,"pt_scored":2,"tw_att":1,"tw_scored":0,"ga_att":0,"ga_scored":0,"actual":2,"xScore":4.21,"eff":0.48,"pt_out":{"Short":3,"Point":2,"Blocked":1},"tw_out":{"Wide":1},"ga_out":{},"per_game":[{"opp":"Ennistymon","pt_att":1,"pt_scored":1,"tw_att":1,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":2,"actual":1,"xScore":1.01,"eff":0.99},{"opp":"Kilrush","pt_att":2,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":2,"actual":1,"xScore":1.11,"eff":0.9},{"opp":"Miltown Malbay","pt_att":3,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":3,"actual":0,"xScore":2.09,"eff":0.0}]},"Conor Burke":{"total":26,"pt_att":21,"pt_scored":9,"tw_att":0,"tw_scored":0,"ga_att":5,"ga_scored":1,"actual":14,"xScore":19.54,"eff":0.72,"pt_out":{"Point":8,"Wide":6,"Short":4,"Blocked":2,"Goal":1},"tw_out":{},"ga_out":{"Blocked":2,"Post":1,"Short":1,"Goal":1},"per_game":[{"opp":"St Breckans","pt_att":1,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":0,"total":2,"actual":0,"xScore":2.53,"eff":0.0},{"opp":"Kilrush","pt_att":11,"pt_scored":5,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":0,"total":12,"actual":5,"xScore":6.22,"eff":0.8},{"opp":"Miltown Malbay","pt_att":9,"pt_scored":4,"tw_att":0,"tw_scored":0,"ga_att":3,"ga_scored":1,"total":12,"actual":9,"xScore":10.79,"eff":0.83}]},"Diarmaid Comber":{"total":3,"pt_att":1,"pt_scored":0,"tw_att":1,"tw_scored":1,"ga_att":1,"ga_scored":0,"actual":2,"xScore":1.99,"eff":1.01,"pt_out":{"Wide":1},"tw_out":{"2 Point":1},"ga_out":{"Blocked":1},"per_game":[{"opp":"Ennistymon","pt_att":0,"pt_scored":0,"tw_att":1,"tw_scored":1,"ga_att":0,"ga_scored":0,"total":1,"actual":2,"xScore":0.61,"eff":3.28},{"opp":"St Breckans","pt_att":1,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":0,"total":2,"actual":0,"xScore":1.38,"eff":0.0}]},"Diarmuid King":{"total":3,"pt_att":2,"pt_scored":1,"tw_att":1,"tw_scored":0,"ga_att":0,"ga_scored":0,"actual":1,"xScore":1.49,"eff":0.67,"pt_out":{"Short":1,"Point":1},"tw_out":{"Short":1},"ga_out":{},"per_game":[{"opp":"Ennistymon","pt_att":1,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":1,"actual":1,"xScore":0.36,"eff":2.78},{"opp":"Miltown Malbay","pt_att":1,"pt_scored":0,"tw_att":1,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":2,"actual":0,"xScore":1.13,"eff":0.0}]},"Jason Cushen":{"total":4,"pt_att":3,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":1,"actual":3,"xScore":2.9,"eff":1.03,"pt_out":{"Wide":3},"tw_out":{},"ga_out":{"Goal":1},"per_game":[{"opp":"Ennistymon","pt_att":2,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":2,"actual":0,"xScore":0.99,"eff":0.0},{"opp":"St Breckans","pt_att":1,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":1,"actual":0,"xScore":0.53,"eff":0.0},{"opp":"Kilrush","pt_att":0,"pt_scored":0,"tw_att":0,"tw_scored":0,"ga_att":1,"ga_scored":1,"total":1,"actual":3,"xScore":1.38,"eff":2.17}]},"Josh Moloney":{"total":3,"pt_att":3,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"actual":1,"xScore":1.74,"eff":0.57,"pt_out":{"Wide":2,"Point":1},"tw_out":{},"ga_out":{},"per_game":[{"opp":"Miltown Malbay","pt_att":3,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":3,"actual":1,"xScore":1.74,"eff":0.57}]},"Keelan Sexton":{"total":24,"pt_att":14,"pt_scored":7,"tw_att":9,"tw_scored":5,"ga_att":1,"ga_scored":0,"actual":17,"xScore":15.65,"eff":1.09,"pt_out":{"Point":7,"Short":3,"Wide":3,"Post":1},"tw_out":{"2 Point":5,"Wide":3,"Short":1},"ga_out":{"Saved":1},"per_game":[{"opp":"Ennistymon","pt_att":8,"pt_scored":3,"tw_att":2,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":10,"actual":3,"xScore":5.93,"eff":0.51},{"opp":"St Breckans","pt_att":4,"pt_scored":2,"tw_att":3,"tw_scored":3,"ga_att":0,"ga_scored":0,"total":7,"actual":8,"xScore":4.21,"eff":1.9},{"opp":"Kilrush","pt_att":2,"pt_scored":2,"tw_att":4,"tw_scored":2,"ga_att":1,"ga_scored":0,"total":7,"actual":6,"xScore":5.51,"eff":1.09}]},"Oisin Sexton":{"total":5,"pt_att":5,"pt_scored":2,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"actual":2,"xScore":2.4,"eff":0.83,"pt_out":{"Point":2,"Wide":2,"Short":1},"tw_out":{},"ga_out":{},"per_game":[{"opp":"Ennistymon","pt_att":2,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":2,"actual":1,"xScore":1.13,"eff":0.88},{"opp":"St Breckans","pt_att":3,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":3,"actual":1,"xScore":1.27,"eff":0.79}]},"Shane Hickey":{"total":8,"pt_att":5,"pt_scored":4,"tw_att":3,"tw_scored":0,"ga_att":0,"ga_scored":0,"actual":4,"xScore":4.61,"eff":0.87,"pt_out":{"Point":4,"Wide":1},"tw_out":{"Short":2,"Wide":1},"ga_out":{},"per_game":[{"opp":"Kilrush","pt_att":2,"pt_scored":2,"tw_att":2,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":4,"actual":2,"xScore":2.41,"eff":0.83},{"opp":"Miltown Malbay","pt_att":3,"pt_scored":2,"tw_att":1,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":4,"actual":2,"xScore":2.2,"eff":0.91}]},"Tomas Sexton":{"total":3,"pt_att":3,"pt_scored":2,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"actual":2,"xScore":2.13,"eff":0.94,"pt_out":{"Point":2,"45":1},"tw_out":{},"ga_out":{},"per_game":[{"opp":"Kilrush","pt_att":2,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":2,"actual":1,"xScore":1.14,"eff":0.88},{"opp":"Miltown Malbay","pt_att":1,"pt_scored":1,"tw_att":0,"tw_scored":0,"ga_att":0,"ga_scored":0,"total":1,"actual":1,"xScore":0.99,"eff":1.01}]}};
+
+const OC={"Point":"#15803d","2 Point":"#14532d","Goal":"#7f1d1d","Wide":"#b91c1c","Short":"#c2410c","Post":"#92400e","Blocked":"#374151","Saved":"#1d4ed8","45":"#1e40af"};
+function opills(o){if(!o||!Object.keys(o).length)return '<span style="color:var(--light);font-size:12px;">None</span>';return Object.entries(o).map(([k,v])=>`<span class="op" style="background:${OC[k]||'#555'};color:#fff;">${k}: ${v}</span>`).join('');}
+function ec(e){return e>=1.2?'#16a34a':e>=0.85?'#ca8a04':'#dc2626';}
+function el(e){return e>=1.2?'Above avg':e>=0.85?'On average':'Below avg';}
+
+const PLAYERS=[{"name":"Aaron Considine","position":"Inside 3 Forwards","games":2,"match":{"tackles":0,"neg_to":0,"own_ko":0,"opp_ko":0,"gen_free":0,"sc_free":0,"tpg":0.0,"npg":0.0},"sc":{"weight":73.4,"run_time":null,"run_secs":null,"cmj1":35,"cmj2":null,"slcmj1":null,"slcmj2":null,"sj1":34,"sj2":null,"broad1":null,"broad2":null,"chin1":9,"chin2":null,"bench1":55,"bench2":null,"bbw":0.75,"btgt":95.4,"squat1":null,"squat2":null,"sbw":null,"stgt":110.1}},{"name":"Ajay Daly","position":"Inside 3 Defenders","games":2,"match":{"tackles":2,"neg_to":0,"own_ko":0,"opp_ko":0,"gen_free":0,"sc_free":0,"tpg":1.0,"npg":0.0},"sc":{"weight":78.4,"run_time":"4:46","run_secs":286,"cmj1":38,"cmj2":42,"slcmj1":"L16/R17","slcmj2":"L18/R20","sj1":34,"sj2":39,"broad1":251,"broad2":270,"chin1":10,"chin2":12,"bench1":70,"bench2":80,"bbw":1.02,"btgt":101.9,"squat1":60,"squat2":90,"sbw":1.15,"stgt":117.6}},{"name":"Cathal Talty","position":"Inside 3 Forwards","games":4,"match":{"tackles":8,"neg_to":7,"own_ko":3,"opp_ko":1,"gen_free":0,"sc_free":0,"tpg":2.0,"npg":1.75},"sc":{"weight":85.5,"run_time":"4:45","run_secs":285,"cmj1":40,"cmj2":42,"slcmj1":"L19/R19","slcmj2":"L20/R20","sj1":41,"sj2":42,"broad1":270,"broad2":270,"chin1":13,"chin2":14,"bench1":90,"bench2":90,"bbw":1.05,"btgt":111.2,"squat1":60,"squat2":90,"sbw":1.05,"stgt":128.2}},{"name":"Ciaran Morrissey","position":"Middle 8","games":4,"match":{"tackles":5,"neg_to":4,"own_ko":2,"opp_ko":6,"gen_free":0,"sc_free":3,"tpg":1.25,"npg":1.0},"sc":{"weight":79,"run_time":"4:29","run_secs":269,"cmj1":35,"cmj2":36,"slcmj1":"L22/R18","slcmj2":"L21/R21","sj1":37,"sj2":37,"broad1":255,"broad2":255,"chin1":15,"chin2":17,"bench1":80,"bench2":80,"bbw":1.01,"btgt":102.7,"squat1":80,"squat2":100,"sbw":1.27,"stgt":118.5}},{"name":"Colin Considine","position":"Middle 8","games":4,"match":{"tackles":12,"neg_to":4,"own_ko":1,"opp_ko":6,"gen_free":1,"sc_free":1,"tpg":3.0,"npg":1.0},"sc":{"weight":74.3,"run_time":"4:43","run_secs":283,"cmj1":45,"cmj2":46,"slcmj1":"L22/R29","slcmj2":"L24/R29","sj1":45,"sj2":46,"broad1":230,"broad2":245,"chin1":13,"chin2":13,"bench1":90,"bench2":95,"bbw":1.28,"btgt":96.6,"squat1":100,"squat2":120,"sbw":1.62,"stgt":111.4}},{"name":"Colin O Neill","position":"Middle 8","games":3,"match":{"tackles":0,"neg_to":1,"own_ko":0,"opp_ko":0,"gen_free":0,"sc_free":0,"tpg":0.0,"npg":0.33},"sc":{"weight":89.3,"run_time":null,"run_secs":null,"cmj1":38,"cmj2":null,"slcmj1":"L18/R19","slcmj2":null,"sj1":40,"sj2":null,"broad1":252,"broad2":null,"chin1":6,"chin2":null,"bench1":70,"bench2":null,"bbw":0.78,"btgt":116.1,"squat1":90,"squat2":null,"sbw":1.01,"stgt":133.9}},{"name":"Conor Burke","position":"Inside 3 Forwards","games":3,"match":{"tackles":4,"neg_to":11,"own_ko":0,"opp_ko":1,"gen_free":2,"sc_free":0,"tpg":1.33,"npg":3.67},"sc":{"weight":76.5,"run_time":"4:47","run_secs":287,"cmj1":46,"cmj2":50,"slcmj1":"L23/R23","slcmj2":"L24/R24","sj1":40,"sj2":45,"broad1":255,"broad2":260,"chin1":10,"chin2":11,"bench1":65,"bench2":70,"bbw":0.92,"btgt":99.5,"squat1":80,"squat2":100,"sbw":1.31,"stgt":114.8}},{"name":"Conor Kearney","position":"Inside 3 Defenders","games":4,"match":{"tackles":11,"neg_to":1,"own_ko":6,"opp_ko":1,"gen_free":2,"sc_free":0,"tpg":2.75,"npg":0.25},"sc":{"weight":75,"run_time":"4:42","run_secs":282,"cmj1":42,"cmj2":35,"slcmj1":"L18/R20","slcmj2":"L17/R17","sj1":40,"sj2":35,"broad1":205,"broad2":210,"chin1":13,"chin2":14,"bench1":80,"bench2":85,"bbw":1.13,"btgt":97.5,"squat1":80,"squat2":100,"sbw":1.33,"stgt":112.5}},{"name":"Darragh Sexton","position":"Middle 8","games":3,"match":{"tackles":11,"neg_to":2,"own_ko":2,"opp_ko":2,"gen_free":2,"sc_free":0,"tpg":3.67,"npg":0.67},"sc":{"weight":73.5,"run_time":"4:26","run_secs":266,"cmj1":null,"cmj2":35,"slcmj1":null,"slcmj2":"L17/R17","sj1":null,"sj2":33,"broad1":null,"broad2":255,"chin1":null,"chin2":17,"bench1":null,"bench2":null,"bbw":null,"btgt":95.5,"squat1":null,"squat2":100,"sbw":1.36,"stgt":110.2}},{"name":"Darren Hickey","position":"Inside 3 Defenders","games":2,"match":{"tackles":2,"neg_to":1,"own_ko":3,"opp_ko":0,"gen_free":0,"sc_free":1,"tpg":1.0,"npg":0.5},"sc":{"weight":null,"run_time":"4:54","run_secs":294,"cmj1":null,"cmj2":null,"slcmj1":null,"slcmj2":null,"sj1":null,"sj2":null,"broad1":null,"broad2":null,"chin1":null,"chin2":null,"bench1":null,"bench2":null,"bbw":null,"btgt":null,"squat1":null,"squat2":null,"sbw":null,"stgt":null}},{"name":"Diarmuid King","position":"Middle 8","games":2,"match":{"tackles":9,"neg_to":2,"own_ko":3,"opp_ko":1,"gen_free":6,"sc_free":1,"tpg":4.5,"npg":1.0},"sc":{"weight":82,"run_time":"4:18","run_secs":258,"cmj1":45,"cmj2":45.5,"slcmj1":"L24/R26","slcmj2":"L26/R26","sj1":42,"sj2":43.5,"broad1":295,"broad2":275,"chin1":15,"chin2":18,"bench1":70,"bench2":75,"bbw":0.91,"btgt":106.6,"squat1":110,"squat2":null,"sbw":1.34,"stgt":123.0}},{"name":"Diarmaid Comber","position":"Middle 8","games":3,"match":{"tackles":10,"neg_to":1,"own_ko":4,"opp_ko":0,"gen_free":2,"sc_free":2,"tpg":3.33,"npg":0.33},"sc":{"weight":83.9,"run_time":"4:46","run_secs":286,"cmj1":45,"cmj2":45.5,"slcmj1":"L16/R20","slcmj2":"L17/R21","sj1":45,"sj2":45,"broad1":285,"broad2":285,"chin1":10,"chin2":11,"bench1":87.5,"bench2":87.5,"bbw":1.04,"btgt":109.1,"squat1":100,"squat2":110,"sbw":1.31,"stgt":125.9}},{"name":"Ian Mc Inerney","position":"Goalkeeper","games":4,"match":{"tackles":0,"neg_to":0,"own_ko":0,"opp_ko":0,"gen_free":0,"sc_free":0,"tpg":0.0,"npg":0.0},"sc":{"weight":105.5,"run_time":null,"run_secs":null,"cmj1":null,"cmj2":39,"slcmj1":null,"slcmj2":"L17/R17","sj1":null,"sj2":39,"broad1":null,"broad2":null,"chin1":null,"chin2":3,"bench1":null,"bench2":80,"bbw":0.76,"btgt":137.2,"squat1":null,"squat2":120,"sbw":1.14,"stgt":158.2}},{"name":"Jason Cushen","position":"Inside 3 Forwards","games":4,"match":{"tackles":5,"neg_to":4,"own_ko":0,"opp_ko":1,"gen_free":1,"sc_free":0,"tpg":1.25,"npg":1.0},"sc":{"weight":75,"run_time":"4:57","run_secs":297,"cmj1":35,"cmj2":35.5,"slcmj1":"L13/R14","slcmj2":"L15/R16","sj1":34,"sj2":34.5,"broad1":230,"broad2":235,"chin1":9,"chin2":9,"bench1":60,"bench2":65,"bbw":0.87,"btgt":97.5,"squat1":90,"squat2":100,"sbw":1.33,"stgt":112.5}},{"name":"Josh Moloney","position":"Middle 8","games":2,"match":{"tackles":4,"neg_to":4,"own_ko":1,"opp_ko":0,"gen_free":1,"sc_free":0,"tpg":2.0,"npg":2.0},"sc":{"weight":76,"run_time":"5:11","run_secs":311,"cmj1":44,"cmj2":null,"slcmj1":"L20/R17","slcmj2":null,"sj1":39,"sj2":null,"broad1":270,"broad2":null,"chin1":17,"chin2":null,"bench1":100,"bench2":null,"bbw":1.32,"btgt":98.8,"squat1":120,"squat2":null,"sbw":1.58,"stgt":114.0}},{"name":"Keelan Sexton","position":"Middle 8","games":3,"match":{"tackles":9,"neg_to":2,"own_ko":1,"opp_ko":5,"gen_free":2,"sc_free":0,"tpg":3.0,"npg":0.67},"sc":{"weight":null,"run_time":"4:25","run_secs":265,"cmj1":null,"cmj2":null,"slcmj1":null,"slcmj2":null,"sj1":null,"sj2":null,"broad1":null,"broad2":null,"chin1":null,"chin2":null,"bench1":null,"bench2":null,"bbw":null,"btgt":null,"squat1":null,"squat2":null,"sbw":null,"stgt":null}},{"name":"Leo Switzer","position":"Middle 8","games":1,"match":{"tackles":3,"neg_to":0,"own_ko":1,"opp_ko":0,"gen_free":0,"sc_free":0,"tpg":3.0,"npg":0.0},"sc":{"weight":74.7,"run_time":null,"run_secs":null,"cmj1":39,"cmj2":null,"slcmj1":"L14/R17","slcmj2":null,"sj1":34,"sj2":null,"broad1":245,"broad2":null,"chin1":11,"chin2":null,"bench1":85,"bench2":null,"bbw":1.14,"btgt":97.1,"squat1":60,"squat2":null,"sbw":0.8,"stgt":112.1}},{"name":"Maurice Donnellan","position":"Inside 3 Defenders","games":4,"match":{"tackles":14,"neg_to":3,"own_ko":2,"opp_ko":0,"gen_free":4,"sc_free":4,"tpg":3.5,"npg":0.75},"sc":{"weight":75.3,"run_time":"4:53","run_secs":293,"cmj1":37,"cmj2":37.5,"slcmj1":"L22/R24","slcmj2":"L23/R24","sj1":36.5,"sj2":36.5,"broad1":270,"broad2":270,"chin1":18,"chin2":13,"bench1":60,"bench2":55,"bbw":0.8,"btgt":97.9,"squat1":80,"squat2":90,"sbw":1.2,"stgt":112.9}},{"name":"Michael Comber","position":"Middle 8","games":4,"match":{"tackles":8,"neg_to":2,"own_ko":0,"opp_ko":1,"gen_free":4,"sc_free":0,"tpg":2.0,"npg":0.5},"sc":{"weight":82,"run_time":"4:56","run_secs":296,"cmj1":46,"cmj2":46.5,"slcmj1":"L18/R17","slcmj2":"L24/R19","sj1":42,"sj2":44,"broad1":287,"broad2":280,"chin1":15,"chin2":15,"bench1":95,"bench2":97.5,"bbw":1.19,"btgt":106.6,"squat1":60,"squat2":110,"sbw":1.34,"stgt":123.0}},{"name":"Oisin Sexton","position":"Middle 8","games":4,"match":{"tackles":4,"neg_to":2,"own_ko":2,"opp_ko":0,"gen_free":0,"sc_free":0,"tpg":1.0,"npg":0.5},"sc":{"weight":85.4,"run_time":"5:00","run_secs":300,"cmj1":34,"cmj2":36,"slcmj1":"L17/R17","slcmj2":"L20/R21","sj1":33,"sj2":37,"broad1":256,"broad2":255,"chin1":9,"chin2":9,"bench1":75,"bench2":80,"bbw":0.94,"btgt":111.0,"squat1":70,"squat2":90,"sbw":1.05,"stgt":128.1}},{"name":"Shane Hickey","position":"Middle 8","games":3,"match":{"tackles":10,"neg_to":6,"own_ko":0,"opp_ko":4,"gen_free":5,"sc_free":1,"tpg":3.33,"npg":2.0},"sc":{"weight":81.1,"run_time":"4:51","run_secs":291,"cmj1":31,"cmj2":35,"slcmj1":"L15/R15","slcmj2":"L16/R17","sj1":31,"sj2":35,"broad1":236,"broad2":235,"chin1":7,"chin2":9,"bench1":80,"bench2":80,"bbw":0.99,"btgt":105.4,"squat1":80,"squat2":80,"sbw":0.99,"stgt":121.6}},{"name":"Shay Gleeson","position":"Inside 3 Defenders","games":3,"match":{"tackles":2,"neg_to":0,"own_ko":2,"opp_ko":0,"gen_free":0,"sc_free":0,"tpg":0.67,"npg":0.0},"sc":{"weight":81,"run_time":"4:59","run_secs":299,"cmj1":29,"cmj2":32,"slcmj1":"L20/R17","slcmj2":"L21/R17","sj1":32,"sj2":34,"broad1":205,"broad2":213,"chin1":7,"chin2":9,"bench1":65,"bench2":70,"bbw":0.86,"btgt":105.3,"squat1":70,"squat2":80,"sbw":0.99,"stgt":121.5}},{"name":"Tom O Flaherthy","position":"Middle 8","games":4,"match":{"tackles":7,"neg_to":2,"own_ko":6,"opp_ko":2,"gen_free":2,"sc_free":0,"tpg":1.75,"npg":0.5},"sc":{"weight":75.8,"run_time":"4:20","run_secs":260,"cmj1":null,"cmj2":45,"slcmj1":null,"slcmj2":"L17/R17","sj1":null,"sj2":39,"broad1":null,"broad2":240,"chin1":null,"chin2":5,"bench1":null,"bench2":null,"bbw":null,"btgt":98.5,"squat1":null,"squat2":80,"sbw":1.06,"stgt":113.7}},{"name":"Tomas Sexton","position":"Goalkeeper","games":4,"match":{"tackles":0,"neg_to":1,"own_ko":0,"opp_ko":0,"gen_free":0,"sc_free":1,"tpg":0.0,"npg":0.25},"sc":{"weight":102.5,"run_time":"5:20","run_secs":320,"cmj1":31,"cmj2":32,"slcmj1":"L14/R14","slcmj2":"L17/R17","sj1":30,"sj2":32,"broad1":230,"broad2":230,"chin1":4,"chin2":5,"bench1":75,"bench2":77.5,"bbw":0.76,"btgt":133.2,"squat1":70,"squat2":75,"sbw":0.73,"stgt":153.8}}];
+
+let AF='All',AP=null,CH={};
+function gp(){return PLAYERS.filter(p=>AF==='All'||p.position===AF);}
+function ini(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();}
+function dc(pos){return pos==='Goalkeeper'?'gk':pos==='Inside 3 Defenders'?'def':pos==='Middle 8'?'mid':'fwd';}
+function ptc(pos){return pos.replace(/\s/g,'').replace('3','3');}
+function dch(){Object.values(CH).forEach(c=>{try{c.destroy();}catch(e){}});CH={};}
+
+function buildSB(){
+  document.getElementById('plist').innerHTML=gp().map(p=>`<div class="pi${AP&&AP.name===p.name?' active':''}" onclick="selP('${p.name}')"><span class="dot ${dc(p.position)}"></span><span class="pn">${p.name}</span><span class="pg">${p.games}g</span></div>`).join('');
+  document.getElementById('sqct').textContent=PLAYERS.length+' players';
+}
+function filterPos(pos,btn){AF=pos;document.querySelectorAll('.pfb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');buildSB();}
+function selP(name){AP=PLAYERS.find(p=>p.name===name);document.getElementById('nav-sq').classList.remove('active');buildSB();renderPlayer();}
+function showSquad(){AP=null;document.getElementById('nav-sq').classList.add('active');buildSB();renderSquad();}
+
+function renderSquad(){
+  dch();
+  const po=['Goalkeeper','Inside 3 Defenders','Middle 8','Inside 3 Forwards'];
+  const bp={};PLAYERS.forEach(p=>{(bp[p.position]||(bp[p.position]=[])).push(p);});
+  let rows='';
+  po.forEach(pos=>{if(!bp[pos])return;bp[pos].forEach(p=>{
+    const m=p.match,td=m.tpg-SAVG.tkl,nd=m.npg-SAVG.nto;
+    const tc2=td>=0.2?'#16a34a':td<=-0.2?'#dc2626':'#ca8a04';
+    const nc2=nd<=-0.2?'#16a34a':nd>=0.2?'#dc2626':'#ca8a04';
+    const sd=SD[p.name];
+    rows+=`<tr onclick="selP('${p.name}')"><td><strong>${p.name}</strong></td>
+      <td><span class="chip cgr">${pos.replace('Inside 3 ','').replace('Middle 8','Mid 8')}</span></td>
+      <td>${p.games}</td><td>${m.tackles}</td>
+      <td style="font-weight:600;">${m.tpg.toFixed(2)}</td>
+      <td style="color:${tc2};font-weight:700;font-size:12px;">${td>=0?'+':''}${td.toFixed(2)}</td>
+      <td>${m.neg_to}</td>
+      <td style="font-weight:600;">${m.npg.toFixed(2)}</td>
+      <td style="color:${nc2};font-weight:700;font-size:12px;">${nd>=0?'+':''}${nd.toFixed(2)}</td>
+      <td>${sd?`<span style="font-weight:700;color:${ec(sd.eff)}">${sd.eff.toFixed(2)}</span>`:'—'}</td>
+    </tr>`;
+  });});
+  document.getElementById('main').innerHTML=`<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;"><div class="ct" style="margin:0;">Squad — Season 2026</div><div style="font-size:11px;color:var(--light);">Squad avg: <strong>2.37</strong> tkl/g · <strong>1.05</strong> neg TO/g (team ÷ 15)</div></div><div style="overflow-x:auto;"><table class="sqt"><thead><tr><th>Player</th><th>Pos</th><th>G</th><th>Tackles</th><th>Tkl/G</th><th>vs Avg</th><th>Neg TO</th><th>NTO/G</th><th>vs Avg</th><th>Shot Eff</th></tr></thead><tbody>${rows}</tbody></table></div><div style="margin-top:9px;font-size:11px;color:var(--light);display:flex;gap:14px;flex-wrap:wrap;"><span style="color:#16a34a;">▲ above avg</span><span style="color:#dc2626;">▼ below avg</span><span>Shot eff: 1.0 = average baseline</span></div></div>`;
+}
+
+function renderPlayer(){
+  dch();
+  const p=AP,s=p.sc,sd=SD[p.name],rg=rGrade(s.run_secs,p.position);
+  const rp=rg?`<span class="pill" style="background:${rg.bg};color:${rg.tc};border-color:${rg.bg};">1.2km ${s.run_time} — <strong>${rg.l}</strong></span>`:'';
+  const ep=sd?`<span class="pill"><strong style="color:${ec(sd.eff)}">${sd.eff.toFixed(2)}</strong> shot eff</span>`:'';
+  document.getElementById('main').innerHTML=`
+    <div class="ph"><div class="av">${ini(p.name)}</div><div class="pi2"><h2>${p.name}</h2><span class="ptag ${ptc(p.position)}">${p.position}</span><div class="pills"><span class="pill"><strong>${p.games}</strong> games</span>${s.weight?`<span class="pill"><strong>${s.weight}</strong> kg</span>`:''}${rp}${ep}</div></div></div>
+    <div class="tabs">
+      <button class="tab active" onclick="swTab('overview',this)">Overview</button>
+      <button class="tab" onclick="swTab('match',this)">Match Stats</button>
+      <button class="tab" onclick="swTab('shooting',this)">Shooting</button>
+      <button class="tab" onclick="swTab('sc',this)">S&amp;C Testing</button>
+      <button class="tab" onclick="swTab('benchmarks',this)">Benchmarks</button>
+      <button class="tab" onclick="swTab('update',this)">Update Data</button>
+    </div>
+    <div id="tb"></div>`;
+  swTabRender('overview');
+}
+function swTab(t,btn){document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');swTabRender(t);}
+function swTabRender(t){dch();const p=AP,tb=document.getElementById('tb');if(t==='overview')tOver(p,tb);else if(t==='match')tMatch(p,tb);else if(t==='shooting')tShoot(p,tb);else if(t==='sc')tSC(p,tb);else if(t==='benchmarks')tBench(p,tb);else if(t==='update')tUpdate(p,tb);}
+
+function tOver(p,tb){
+  const m=p.match,s=p.sc,sd=SD[p.name];
+  const td=m.tpg-SAVG.tkl,nd=m.npg-SAVG.nto;
+  const tst=td>=0.2?'above':td<=-0.2?'below':'avg',nst=nd<=-0.2?'above':nd>=0.2?'below':'avg';
+  const tc=tst==='above'?'#16a34a':tst==='below'?'#dc2626':'#ca8a04';
+  const nc=nst==='above'?'#16a34a':nst==='below'?'#dc2626':'#ca8a04';
+  const ti=tst==='above'?'▲':tst==='below'?'▼':'●',ni=nst==='above'?'▲':nst==='below'?'▼':'●';
+  const tl=tst==='above'?'Above avg':tst==='below'?'Below avg':'On average';
+  const nl=nst==='above'?'Above avg':nst==='below'?'Below avg':'On average';
+  const rg=rGrade(s.run_secs,p.position),k=pk(p.position);
+  const cb=Math.max(s.cmj1||0,s.cmj2||0)||null,bb=Math.max(s.broad1||0,s.broad2||0)||null;
+  tb.innerHTML=`
+    <div class="sh2">Tackles &amp; Turnovers vs Squad Average</div>
+    <div class="g g2" style="margin-bottom:13px;">
+      <div class="card" style="padding:15px 17px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:11px;">
+          <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--light);">Tackles / Game</div><div style="font-size:28px;font-weight:700;line-height:1.1;margin-top:2px;">${m.tpg.toFixed(2)}</div><div style="font-size:11px;color:var(--light);">${m.tackles} total · ${p.games} games</div></div>
+          <div style="text-align:right;"><div style="font-size:18px;color:${tc};">${ti}</div><div style="font-size:12px;font-weight:700;color:${tc};">${tl}</div><div style="font-size:11px;color:var(--light);">${td>=0?'+':''}${td.toFixed(2)} vs avg</div></div>
+        </div>
+        <div style="margin-bottom:5px;"><div style="font-size:10px;color:var(--light);margin-bottom:3px;">Player ${m.tpg.toFixed(2)}/g</div><div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${Math.min(m.tpg/6*100,100)}%;background:${tc};border-radius:4px;"></div></div></div>
+        <div><div style="font-size:10px;color:var(--light);margin-bottom:3px;">Squad avg ${SAVG.tkl.toFixed(2)}/g</div><div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${Math.min(SAVG.tkl/6*100,100)}%;background:#9ca3af;border-radius:4px;"></div></div></div>
+        <div style="font-size:10px;color:var(--light);border-top:1px solid var(--border);margin-top:9px;padding-top:7px;">Team avg ${SAVG.ttkl.toFixed(1)}/game ÷ 15 players</div>
+      </div>
+      <div class="card" style="padding:15px 17px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:11px;">
+          <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--light);">Neg. Turnovers / Game</div><div style="font-size:28px;font-weight:700;line-height:1.1;margin-top:2px;">${m.npg.toFixed(2)}</div><div style="font-size:11px;color:var(--light);">${m.neg_to} total · ${p.games} games</div></div>
+          <div style="text-align:right;"><div style="font-size:18px;color:${nc};">${ni}</div><div style="font-size:12px;font-weight:700;color:${nc};">${nl}</div><div style="font-size:11px;color:var(--light);">${nd>=0?'+':''}${nd.toFixed(2)} vs avg</div></div>
+        </div>
+        <div style="margin-bottom:5px;"><div style="font-size:10px;color:var(--light);margin-bottom:3px;">Player ${m.npg.toFixed(2)}/g</div><div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${Math.min(m.npg/6*100,100)}%;background:${nc};border-radius:4px;"></div></div></div>
+        <div><div style="font-size:10px;color:var(--light);margin-bottom:3px;">Squad avg ${SAVG.nto.toFixed(2)}/g</div><div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${Math.min(SAVG.nto/6*100,100)}%;background:#9ca3af;border-radius:4px;"></div></div></div>
+        <div style="font-size:10px;color:var(--light);border-top:1px solid var(--border);margin-top:9px;padding-top:7px;">Lower = better · Team avg ${SAVG.tnto.toFixed(1)}/game ÷ 15</div>
+      </div>
+    </div>
+    <div class="sh2">Quick Snapshot</div>
+    <div class="g g2">
+      ${sd?`<div class="card"><div class="ct">Shooting</div><div style="display:flex;align-items:center;gap:12px;"><div style="text-align:center;"><div style="font-size:26px;font-weight:700;color:${ec(sd.eff)};">${sd.eff.toFixed(2)}</div><div style="font-size:11px;color:var(--light);">Efficiency</div></div><div style="flex:1;"><div style="font-size:12px;color:var(--muted);margin-bottom:3px;">${sd.actual} pts from ${sd.total} shots · xS ${sd.xScore}</div><div style="font-size:12px;color:var(--muted);">${el(sd.eff)}</div><div style="margin-top:7px;font-size:11px;"><span style="color:#16a34a;font-weight:600;">${sd.pt_scored}/${sd.pt_att}</span> 1pt &nbsp;<span style="color:#15803d;font-weight:600;">${sd.tw_scored}/${sd.tw_att}</span> 2pt &nbsp;<span style="color:#dc2626;font-weight:600;">${sd.ga_scored}/${sd.ga_att}</span> goals</div></div></div></div>`
+      :'<div class="card"><div class="ct">Shooting</div><div style="color:var(--light);font-size:13px;">No shot data recorded</div></div>'}
+      <div class="card"><div class="ct">S&amp;C Snapshot</div>
+        ${rg?`<div style="margin-bottom:9px;"><span class="rbd" style="background:${rg.bg};color:${rg.tc};">${rg.l}</span> <span style="font-size:13px;font-weight:600;margin-left:5px;">${s.run_time}</span> <span style="font-size:11px;color:var(--light);">1.2km</span></div>`:''}
+        <div class="pr"><div class="pl">CMJ best</div><div class="pt"><div class="pf2" style="width:${cb?Math.min(cb/65*100,100):0}%;background:var(--green2);"></div></div><div class="pv">${cb||'—'}</div><div class="ptg">/ ${BM['cmj_'+k]}</div></div>
+        <div class="pr"><div class="pl">Broad Jump</div><div class="pt"><div class="pf2" style="width:${bb?Math.min(bb/320*100,100):0}%;background:var(--blue);"></div></div><div class="pv">${bb||'—'}</div><div class="ptg">/ ${BM['broad_'+k]}</div></div>
+        <div class="pr"><div class="pl">Bench/BW</div><div class="pt"><div class="pf2" style="width:${s.bbw?Math.min(s.bbw/2*100,100):0}%;background:${s.bbw>=1.3?'#16a34a':'#ca8a04'};"></div></div><div class="pv">${s.bbw||'—'}</div><div class="ptg">/ 1.3</div></div>
+        <div class="pr"><div class="pl">Squat/BW</div><div class="pt"><div class="pf2" style="width:${s.sbw?Math.min(s.sbw/2.5*100,100):0}%;background:${s.sbw>=1.5?'#16a34a':'#ca8a04'};"></div></div><div class="pv">${s.sbw||'—'}</div><div class="ptg">/ 1.5</div></div>
+      </div>
+    </div>`;
+}
+
+// Per-game match stats (tackles/TO/KO/free from hardcoded data, shots from CSV)
+const PG_MATCH={"Tomas Sexton":[{opp:"Ennistymon",t:0,n:1,ok:0,pk:0,gf:0,sf:0},{opp:"St Breckans",t:0,n:0,ok:0,pk:0,gf:0,sf:1},{opp:"Kilrush",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:0,n:0,ok:0,pk:0,gf:0,sf:0}],"Conor Kearney":[{opp:"Ennistymon",t:3,n:1,ok:1,pk:0,gf:0,sf:0},{opp:"St Breckans",t:3,n:0,ok:1,pk:1,gf:0,sf:0},{opp:"Kilrush",t:2,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:3,n:0,ok:4,pk:0,gf:2,sf:0}],"Maurice Donnellan":[{opp:"Ennistymon",t:7,n:2,ok:0,pk:0,gf:1,sf:0},{opp:"St Breckans",t:3,n:0,ok:1,pk:0,gf:0,sf:1},{opp:"Kilrush",t:3,n:0,ok:1,pk:0,gf:2,sf:0},{opp:"Miltown Malbay",t:1,n:1,ok:0,pk:0,gf:1,sf:3}],"Shay Gleeson":[{opp:"Ennistymon",t:2,n:0,ok:1,pk:0,gf:0,sf:0},{opp:"St Breckans",t:0,n:0,ok:1,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:0,n:0,ok:0,pk:0,gf:0,sf:0}],"Darragh Sexton":[{opp:"Ennistymon",t:4,n:0,ok:2,pk:1,gf:0,sf:0},{opp:"Kilrush",t:3,n:2,ok:0,pk:1,gf:0,sf:0},{opp:"Miltown Malbay",t:4,n:0,ok:0,pk:0,gf:2,sf:0}],"Ciaran Morrissey":[{opp:"Ennistymon",t:4,n:2,ok:0,pk:1,gf:0,sf:2},{opp:"St Breckans",t:1,n:0,ok:0,pk:1,gf:0,sf:1},{opp:"Kilrush",t:0,n:1,ok:1,pk:3,gf:0,sf:0},{opp:"Miltown Malbay",t:0,n:1,ok:1,pk:1,gf:0,sf:0}],"Diarmaid Comber":[{opp:"Ennistymon",t:6,n:0,ok:2,pk:0,gf:1,sf:0},{opp:"St Breckans",t:3,n:1,ok:2,pk:0,gf:1,sf:2},{opp:"Miltown Malbay",t:1,n:0,ok:0,pk:0,gf:0,sf:0}],"Michael Comber":[{opp:"Ennistymon",t:2,n:0,ok:0,pk:1,gf:1,sf:0},{opp:"St Breckans",t:0,n:0,ok:0,pk:0,gf:1,sf:0},{opp:"Kilrush",t:4,n:2,ok:0,pk:0,gf:1,sf:0},{opp:"Miltown Malbay",t:2,n:0,ok:0,pk:0,gf:1,sf:0}],"Diarmuid King":[{opp:"Ennistymon",t:5,n:2,ok:2,pk:0,gf:5,sf:0},{opp:"Miltown Malbay",t:4,n:0,ok:1,pk:1,gf:1,sf:1}],"Colin Considine":[{opp:"Ennistymon",t:2,n:2,ok:0,pk:3,gf:0,sf:1},{opp:"St Breckans",t:3,n:1,ok:0,pk:0,gf:0,sf:0},{opp:"Kilrush",t:6,n:0,ok:0,pk:1,gf:1,sf:0},{opp:"Miltown Malbay",t:1,n:1,ok:1,pk:2,gf:0,sf:0}],"Keelan Sexton":[{opp:"Ennistymon",t:1,n:1,ok:1,pk:2,gf:1,sf:0},{opp:"St Breckans",t:4,n:1,ok:0,pk:0,gf:0,sf:0},{opp:"Kilrush",t:4,n:0,ok:0,pk:3,gf:1,sf:0}],"Tom O Flaherthy":[{opp:"Ennistymon",t:2,n:0,ok:1,pk:0,gf:1,sf:0},{opp:"St Breckans",t:4,n:1,ok:2,pk:0,gf:0,sf:0},{opp:"Kilrush",t:1,n:0,ok:3,pk:2,gf:1,sf:0},{opp:"Miltown Malbay",t:0,n:1,ok:0,pk:0,gf:0,sf:0}],"Oisin Sexton":[{opp:"Ennistymon",t:2,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"St Breckans",t:2,n:1,ok:1,pk:0,gf:0,sf:0},{opp:"Kilrush",t:0,n:1,ok:1,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:0,n:0,ok:0,pk:0,gf:0,sf:0}],"Cathal Talty":[{opp:"Ennistymon",t:1,n:0,ok:1,pk:0,gf:0,sf:0},{opp:"St Breckans",t:3,n:2,ok:2,pk:1,gf:0,sf:0},{opp:"Kilrush",t:2,n:1,ok:0,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:2,n:4,ok:0,pk:0,gf:0,sf:0}],"Jason Cushen":[{opp:"Ennistymon",t:2,n:2,ok:0,pk:0,gf:0,sf:0},{opp:"St Breckans",t:1,n:0,ok:0,pk:1,gf:0,sf:0},{opp:"Kilrush",t:2,n:2,ok:0,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:0,n:0,ok:0,pk:0,gf:1,sf:0}],"Ian Mc Inerney":[{opp:"Ennistymon",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"St Breckans",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"Kilrush",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:0,n:0,ok:0,pk:0,gf:0,sf:0}],"Colin O Neill":[{opp:"Ennistymon",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"St Breckans",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"Kilrush",t:0,n:1,ok:0,pk:0,gf:0,sf:0}],"Shane Hickey":[{opp:"Ennistymon",t:4,n:2,ok:0,pk:0,gf:2,sf:1},{opp:"Kilrush",t:4,n:3,ok:0,pk:4,gf:2,sf:0},{opp:"Miltown Malbay",t:2,n:1,ok:0,pk:0,gf:1,sf:0}],"Aaron Considine":[{opp:"Ennistymon",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"Kilrush",t:0,n:0,ok:0,pk:0,gf:0,sf:0}],"Leo Switzer":[{opp:"St Breckans",t:3,n:0,ok:1,pk:0,gf:0,sf:0}],"Conor Burke":[{opp:"St Breckans",t:0,n:1,ok:0,pk:0,gf:0,sf:0},{opp:"Kilrush",t:4,n:4,ok:0,pk:1,gf:1,sf:0},{opp:"Miltown Malbay",t:0,n:6,ok:0,pk:0,gf:1,sf:0}],"Ajay Daly":[{opp:"St Breckans",t:0,n:0,ok:0,pk:0,gf:0,sf:0},{opp:"Kilrush",t:2,n:0,ok:0,pk:0,gf:0,sf:0}],"Josh Moloney":[{opp:"Kilrush",t:1,n:3,ok:1,pk:0,gf:0,sf:0},{opp:"Miltown Malbay",t:3,n:1,ok:0,pk:0,gf:1,sf:0}],"Darren Hickey":[{opp:"Kilrush",t:1,n:0,ok:1,pk:0,gf:0,sf:1},{opp:"Miltown Malbay",t:1,n:1,ok:2,pk:0,gf:0,sf:0}]};
+
+// Per-game shot data from CSVs
+const PG_SHOTS={"Aaron Considine":[{"opp":"Kilrush","pt_att":0,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":1,"ga_sc":1,"total":1,"actual":3,"xs":1.9,"eff":1.58}],"Ajay Daly":[{"opp":"Kilrush","pt_att":0,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":1,"ga_sc":0,"total":1,"actual":0,"xs":0.76,"eff":0.0}],"Cathal Talty":[{"opp":"Ennistymon","pt_att":4,"pt_sc":2,"tw_att":1,"tw_sc":0,"ga_att":1,"ga_sc":0,"total":6,"actual":5,"xs":3.55,"eff":1.41},{"opp":"St Breckans","pt_att":3,"pt_sc":2,"tw_att":4,"tw_sc":1,"ga_att":0,"ga_sc":0,"total":7,"actual":4,"xs":5.09,"eff":0.79},{"opp":"Kilrush","pt_att":5,"pt_sc":4,"tw_att":5,"tw_sc":3,"ga_att":1,"ga_sc":1,"total":11,"actual":13,"xs":8.03,"eff":1.62},{"opp":"Miltown Malbay","pt_att":0,"pt_sc":0,"tw_att":2,"tw_sc":0,"ga_att":1,"ga_sc":0,"total":3,"actual":0,"xs":3.76,"eff":0.0}],"Ciaran Morrissey":[{"opp":"Ennistymon","pt_att":1,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":1,"ga_sc":0,"total":2,"actual":1,"xs":2.19,"eff":0.46},{"opp":"St Breckans","pt_att":1,"pt_sc":1,"tw_att":1,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":2,"actual":1,"xs":1.19,"eff":0.84},{"opp":"Kilrush","pt_att":1,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":1,"actual":0,"xs":0.66,"eff":0.0}],"Colin Considine":[{"opp":"Ennistymon","pt_att":1,"pt_sc":1,"tw_att":1,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":2,"actual":1,"xs":1.01,"eff":0.99},{"opp":"Kilrush","pt_att":2,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":2,"actual":1,"xs":1.11,"eff":0.9},{"opp":"Miltown Malbay","pt_att":3,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":3,"actual":0,"xs":2.09,"eff":0.0}],"Conor Burke":[{"opp":"St Breckans","pt_att":1,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":1,"ga_sc":0,"total":2,"actual":0,"xs":2.53,"eff":0.0},{"opp":"Kilrush","pt_att":11,"pt_sc":5,"tw_att":0,"tw_sc":0,"ga_att":1,"ga_sc":0,"total":12,"actual":5,"xs":6.22,"eff":0.8},{"opp":"Miltown Malbay","pt_att":9,"pt_sc":4,"tw_att":0,"tw_sc":0,"ga_att":3,"ga_sc":1,"total":12,"actual":9,"xs":10.79,"eff":0.83}],"Diarmaid Comber":[{"opp":"Ennistymon","pt_att":0,"pt_sc":0,"tw_att":1,"tw_sc":1,"ga_att":0,"ga_sc":0,"total":1,"actual":2,"xs":0.61,"eff":3.28},{"opp":"St Breckans","pt_att":1,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":1,"ga_sc":0,"total":2,"actual":0,"xs":1.38,"eff":0.0}],"Diarmuid King":[{"opp":"Ennistymon","pt_att":1,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":1,"actual":1,"xs":0.36,"eff":2.78},{"opp":"Miltown Malbay","pt_att":1,"pt_sc":0,"tw_att":1,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":2,"actual":0,"xs":1.13,"eff":0.0}],"Jason Cushen":[{"opp":"Ennistymon","pt_att":2,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":2,"actual":0,"xs":0.99,"eff":0.0},{"opp":"St Breckans","pt_att":1,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":1,"actual":0,"xs":0.53,"eff":0.0},{"opp":"Kilrush","pt_att":0,"pt_sc":0,"tw_att":0,"tw_sc":0,"ga_att":1,"ga_sc":1,"total":1,"actual":3,"xs":1.38,"eff":2.17}],"Josh Moloney":[{"opp":"Miltown Malbay","pt_att":3,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":3,"actual":1,"xs":1.74,"eff":0.57}],"Keelan Sexton":[{"opp":"Ennistymon","pt_att":8,"pt_sc":3,"tw_att":2,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":10,"actual":3,"xs":5.93,"eff":0.51},{"opp":"St Breckans","pt_att":4,"pt_sc":2,"tw_att":3,"tw_sc":3,"ga_att":0,"ga_sc":0,"total":7,"actual":8,"xs":4.21,"eff":1.9},{"opp":"Kilrush","pt_att":2,"pt_sc":2,"tw_att":4,"tw_sc":2,"ga_att":1,"ga_sc":0,"total":7,"actual":6,"xs":5.51,"eff":1.09}],"Oisin Sexton":[{"opp":"Ennistymon","pt_att":2,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":2,"actual":1,"xs":1.13,"eff":0.88},{"opp":"St Breckans","pt_att":3,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":3,"actual":1,"xs":1.27,"eff":0.79}],"Shane Hickey":[{"opp":"Kilrush","pt_att":2,"pt_sc":2,"tw_att":2,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":4,"actual":2,"xs":2.41,"eff":0.83},{"opp":"Miltown Malbay","pt_att":3,"pt_sc":2,"tw_att":1,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":4,"actual":2,"xs":2.2,"eff":0.91}],"Tomas Sexton":[{"opp":"Kilrush","pt_att":2,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":2,"actual":1,"xs":1.14,"eff":0.88},{"opp":"Miltown Malbay","pt_att":1,"pt_sc":1,"tw_att":0,"tw_sc":0,"ga_att":0,"ga_sc":0,"total":1,"actual":1,"xs":0.99,"eff":1.01}]};
+
+function shotGrade(e){if(e===null||e===undefined)return null;if(e>=1.10)return{l:'Inter County',bg:'#14532d',tc:'#fff'};if(e>=1.00)return{l:'Senior',bg:'#16a34a',tc:'#fff'};if(e>=0.85)return{l:'Intermediate',bg:'#ca8a04',tc:'#fff'};if(e>=0.75)return{l:'Junior',bg:'#ea580c',tc:'#fff'};if(e>=0.50)return{l:'Junior B',bg:'#dc2626',tc:'#fff'};return{l:'Below',bg:'#6b7280',tc:'#fff'};}
+
+function tMatch(p,tb){
+  const m=p.match;
+  const pgM=PG_MATCH[p.name]||[];
+  const pgS=PG_SHOTS[p.name]||[];
+  // Build combined rows: merge by opp
+  const allOpps=['Ennistymon','St Breckans','Kilrush','Miltown Malbay'];
+  const rows=allOpps.map(opp=>{
+    const md=pgM.find(g=>g.opp===opp);
+    const sd=pgS.find(g=>g.opp===opp);
+    if(!md&&!sd) return '';
+    const t=md?md.t:'—',n=md?md.n:'—',ok=md?md.ok:'—',pk=md?md.pk:'—',gf=md?md.gf:'—';
+    const nColor=md?(md.n>=3?'#dc2626':md.n>=2?'#ca8a04':'inherit'):'inherit';
+    let shotCell='—';
+    if(sd){
+      const pts=sd.pt_sc>0||sd.pt_att>0?`<span style="color:#15803d;font-weight:600;">${sd.pt_sc}/${sd.pt_att}</span>`:null;
+      const tw=sd.tw_att>0?`<span style="color:#14532d;font-weight:600;">${sd.tw_sc}/${sd.tw_att}</span>`:null;
+      const ga=sd.ga_att>0?`<span style="color:#991b1b;font-weight:600;">${sd.ga_sc}/${sd.ga_att}g</span>`:null;
+      const parts=[pts,tw,ga].filter(Boolean).join(' · ');
+      const sg=shotGrade(sd.eff);
+      const effBadge=sg?`<span style="background:${sg.bg};color:${sg.tc};padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700;margin-left:4px;">${sd.eff.toFixed(2)}</span>`:'';
+      shotCell=`${parts}${effBadge}`;
+    }
+    return `<tr>
+      <td><strong>v ${opp}</strong></td>
+      <td>${t}</td>
+      <td style="color:${nColor};font-weight:${md&&md.n>=2?'700':'400'};">${n}</td>
+      <td>${ok}</td><td>${pk}</td><td>${gf}</td><td>${sf}</td>
+      <td>${shotCell}</td>
+    </tr>`;
+  }).filter(Boolean).join('');
+  tb.innerHTML=`
+    <div class="g g5" style="margin-bottom:13px;grid-template-columns:repeat(6,1fr);">
+      <div class="card met"><div class="v">${m.tackles}</div><div class="l">Tackles</div></div>
+      <div class="card met"><div class="v">${m.neg_to}</div><div class="l">Neg. Turnovers</div></div>
+      <div class="card met"><div class="v">${m.own_ko}</div><div class="l">Own Kickouts</div></div>
+      <div class="card met"><div class="v">${m.opp_ko}</div><div class="l">Opp. Kickouts</div></div>
+      <div class="card met"><div class="v">${m.gen_free}</div><div class="l">General Frees</div></div>
+      <div class="card met"><div class="v">${m.sc_free||0}</div><div class="l">Scorable Frees</div></div>
+    </div>
+    <div class="card"><div class="ct">Game by Game</div>
+      <div style="overflow-x:auto;"><table class="tbl">
+        <thead><tr><th>Opponent</th><th>Tackles</th><th>Neg TO</th><th>Own KO</th><th>Opp KO</th><th>Gen Free</th><th>Sc Free</th><th>Shots (1pt · 2pt · goal) + Eff</th></tr></thead>
+        <tbody>${rows||'<tr><td colspan="7" style="color:var(--light);text-align:center;padding:20px;">No per-game data available</td></tr>'}</tbody>
+      </table></div>
+      <div style="font-size:11px;color:var(--light);margin-top:8px;display:flex;gap:12px;flex-wrap:wrap;">
+        <span style="color:#15803d;">■ 1pt</span>
+        <span style="color:#14532d;">■ 2pt</span>
+        <span style="color:#991b1b;">■ goals</span>
+        <span>Eff badge: scored ÷ xScore</span>
+      </div>
+    </div>`;
+}
+
+function tShoot(p,tb){
+  dch();
+  const sd=SD[p.name];
+  if(!sd||sd.total===0){tb.innerHTML='<div class="emp"><div style="font-size:36px;margin-bottom:12px;">🎯</div><div>No shot data recorded.</div></div>';return;}
+  const ptC=sd.pt_att>0?Math.round(sd.pt_scored/sd.pt_att*100):null;
+  const twC=sd.tw_att>0?Math.round(sd.tw_scored/sd.tw_att*100):null;
+  const gaC=sd.ga_att>0?Math.round(sd.ga_scored/sd.ga_att*100):null;
+  const ecolor=ec(sd.eff),elabel=el(sd.eff);
+  const pgRows=sd.per_game.map(g=>`<tr><td><strong>v ${g.opp}</strong></td><td>${g.pt_att>0?g.pt_scored+'/'+g.pt_att:'—'}</td><td>${g.tw_att>0?g.tw_scored+'/'+g.tw_att:'—'}</td><td>${g.ga_att>0?g.ga_scored+'/'+g.ga_att:'—'}</td><td><strong>${g.total}</strong></td><td><strong>${g.actual}</strong> pts</td><td style="color:var(--light);font-size:12px;">${g.xScore}</td><td><span style="font-weight:700;color:${ec(g.eff)};">${g.eff.toFixed(2)}</span></td></tr>`).join('');
+  tb.innerHTML=`
+    <div class="g g4" style="margin-bottom:13px;">
+      <div class="card met"><div class="v">${sd.total}</div><div class="l">Total Shots</div></div>
+      <div class="card met"><div class="v">${sd.actual}<span style="font-size:13px;color:var(--muted);"> pts</span></div><div class="l">Points Scored</div></div>
+      <div class="card met"><div class="v" style="font-size:18px;color:var(--muted);">${sd.xScore}</div><div class="l">Expected Score</div></div>
+      <div class="card met"><div class="v" style="color:${ecolor};">${sd.eff.toFixed(2)}</div><div class="l">Efficiency vs 1.0</div><div style="font-size:10px;color:${ecolor};font-weight:700;margin-top:2px;">${elabel}</div></div>
+    </div>
+    <div class="g g3" style="margin-bottom:13px;">
+      <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;"><div class="ct" style="margin:0;">1 Point Attempts</div>${sd.pt_att>0?`<span style="font-size:17px;font-weight:700;color:#15803d;">${sd.pt_scored}/${sd.pt_att}</span>`:'<span style="color:var(--light);">—</span>'}</div>
+        ${sd.pt_att>0?`<div style="height:7px;background:var(--bg);border-radius:4px;overflow:hidden;margin-bottom:6px;"><div style="height:100%;width:${ptC}%;background:#16a34a;border-radius:4px;"></div></div><div style="font-size:13px;font-weight:700;color:#16a34a;margin-bottom:7px;">${ptC}% conv</div><div>${opills(sd.pt_out)}</div>`:'<div style="color:var(--light);font-size:13px;">No 1pt attempts</div>'}
+      </div>
+      <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;"><div class="ct" style="margin:0;">2 Point Attempts</div>${sd.tw_att>0?`<span style="font-size:17px;font-weight:700;color:#14532d;">${sd.tw_scored}/${sd.tw_att}</span>`:'<span style="color:var(--light);">—</span>'}</div>
+        ${sd.tw_att>0?`<div style="height:7px;background:var(--bg);border-radius:4px;overflow:hidden;margin-bottom:6px;"><div style="height:100%;width:${twC}%;background:#15803d;border-radius:4px;"></div></div><div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:7px;">${twC}% conv</div><div>${opills(sd.tw_out)}</div>`:'<div style="color:var(--light);font-size:13px;">No 2pt attempts</div>'}
+      </div>
+      <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;"><div class="ct" style="margin:0;">Goal Attempts</div>${sd.ga_att>0?`<span style="font-size:17px;font-weight:700;color:#991b1b;">${sd.ga_scored}/${sd.ga_att}</span>`:'<span style="color:var(--light);">—</span>'}</div>
+        ${sd.ga_att>0?`<div style="height:7px;background:var(--bg);border-radius:4px;overflow:hidden;margin-bottom:6px;"><div style="height:100%;width:${gaC||0}%;background:#dc2626;border-radius:4px;"></div></div><div style="font-size:13px;font-weight:700;color:#dc2626;margin-bottom:7px;">${gaC||0}% conv</div><div>${opills(sd.ga_out)}</div>`:'<div style="color:var(--light);font-size:13px;">No goal attempts</div>'}
+      </div>
+    </div>
+    <div class="g g2" style="margin-bottom:13px;">
+      <div class="card"><div class="ct">Efficiency vs 1.0 Baseline</div>
+        <div style="display:flex;align-items:center;gap:13px;padding:5px 0;">
+          <div style="flex:1;"><div style="height:13px;background:var(--bg);border-radius:7px;position:relative;overflow:visible;"><div style="position:absolute;left:0;top:0;height:100%;width:${Math.min(sd.eff/2*100,100)}%;background:${ecolor};border-radius:7px;overflow:hidden;"></div><div style="position:absolute;left:50%;top:-3px;width:2px;height:19px;background:#9ca3af;border-radius:1px;"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--light);margin-top:4px;"><span>0</span><span>1.0 avg</span><span>2.0</span></div></div>
+          <div style="text-align:center;min-width:58px;"><div style="font-size:24px;font-weight:700;color:${ecolor};">${sd.eff.toFixed(2)}</div><div style="font-size:10px;color:var(--light);">${sd.eff>=1.0?'Outperforming':'Underperforming'}</div></div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);border-top:1px solid var(--border);margin-top:9px;padding-top:7px;">Actual <strong>${sd.actual}pts</strong> · Expected <strong>${sd.xScore}pts</strong></div>
+      </div>
+      <div class="card"><div class="ct">Shot Mix</div><div class="cw" style="height:150px;"><canvas id="ch-mix" role="img" aria-label="Shot type mix"></canvas></div></div>
+    </div>
+    <div class="card"><div class="ct">Game by Game</div><div style="overflow-x:auto;"><table class="tbl"><thead><tr><th>Opponent</th><th>1pt (sc/att)</th><th>2pt (sc/att)</th><th>Goal (sc/att)</th><th>Shots</th><th>Actual</th><th>xScore</th><th>Efficiency</th></tr></thead><tbody>${pgRows}</tbody></table></div></div>`;
+  setTimeout(()=>{
+    const ctx=document.getElementById('ch-mix');
+    if(!ctx)return;
+    const vd=[{v:sd.pt_att,l:'1pt Attempt',c:'#16a34a'},{v:sd.tw_att,l:'2pt Attempt',c:'#14532d'},{v:sd.ga_att,l:'Goal Attempt',c:'#dc2626'}].filter(x=>x.v>0);
+    CH['mix']=new Chart(ctx,{type:'doughnut',data:{labels:vd.map(x=>x.l),datasets:[{data:vd.map(x=>x.v),backgroundColor:vd.map(x=>x.c),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'right',labels:{font:{size:11},boxWidth:12}}}}});
+  },80);
+}
+
+function tSC(p,tb){
+  const s=p.sc;
+  const cb=Math.max(s.cmj1||0,s.cmj2||0)||null,sb=Math.max(s.sj1||0,s.sj2||0)||null;
+  const rg=rGrade(s.run_secs,p.position);
+  tb.innerHTML=`
+    <div class="g g3" style="margin-bottom:13px;">
+      <div class="card met"><div class="v">${s.weight||'—'}<span style="font-size:13px;color:var(--muted);"> kg</span></div><div class="l">Body Weight</div></div>
+      <div class="card met">${s.run_secs?(()=>{return rg?`<div style="background:${rg.bg};color:${rg.tc};border-radius:7px;padding:3px 9px;font-size:11px;font-weight:700;margin-bottom:4px;display:inline-block;">${rg.l}</div><div class="v" style="font-size:18px;">${s.run_time}</div>`:'<div class="v">—</div>';})():'<div class="v" style="font-size:18px;">—</div>'}<div class="l">1.2km Run</div></div>
+      <div class="card met"><div class="v">${s.chin2||s.chin1||'—'}</div><div class="l">Chin Ups (best)</div></div>
+    </div>
+    <div class="g g2" style="margin-bottom:13px;">
+      <div class="card"><div class="ct">Jump Tests (cm)</div><div class="cw" style="height:195px;"><canvas id="ch-jmp" role="img" aria-label="Jump tests"></canvas></div></div>
+      <div class="card"><div class="ct">Broad Jump (cm)</div>
+        ${s.broad1?`<div class="br"><div class="bh"><span>Test 1</span><strong>${s.broad1}cm</strong></div><div class="pt" style="height:8px;"><div class="pf2" style="width:${Math.min(s.broad1/320*100,100)}%;background:var(--blue);height:100%;"></div></div></div>`:''}
+        ${s.broad2?`<div class="br"><div class="bh"><span>Test 2</span><strong>${s.broad2}cm</strong></div><div class="pt" style="height:8px;"><div class="pf2" style="width:${Math.min(s.broad2/320*100,100)}%;background:var(--green2);height:100%;"></div></div></div>`:''}
+        ${s.broad1&&s.broad2?`<div style="font-size:12px;color:var(--muted);margin-top:5px;">Change: <strong style="color:${s.broad2>s.broad1?'#16a34a':'#dc2626'}">${s.broad2>s.broad1?'+':''}${s.broad2-s.broad1}cm</strong></div>`:''}
+        <div class="ct" style="margin-top:13px;">SLCMJ</div>
+        ${s.slcmj1?`<div style="font-size:13px;margin-bottom:3px;">Test 1: <strong>${s.slcmj1}</strong></div>`:''}
+        ${s.slcmj2?`<div style="font-size:13px;">Test 2: <strong>${s.slcmj2}</strong></div>`:''}
+        ${!s.slcmj1&&!s.slcmj2?'<div style="color:var(--light);font-size:13px;">No data</div>':''}
+      </div>
+    </div>
+    <div class="g g2">
+      <div class="card"><div class="ct">Bench Press</div>
+        ${s.bench1||s.bench2?`${s.bench1?`<div class="br"><div class="bh"><span>Test 1</span><strong>${s.bench1}kg</strong></div><div class="pt" style="height:8px;"><div class="pf2" style="width:${Math.min(s.bench1/150*100,100)}%;background:var(--blue);height:100%;"></div></div></div>`:''} ${s.bench2?`<div class="br"><div class="bh"><span>Test 2</span><strong>${s.bench2}kg</strong></div><div class="pt" style="height:8px;"><div class="pf2" style="width:${Math.min(s.bench2/150*100,100)}%;background:var(--green2);height:100%;"></div></div></div>`:''}<div style="font-size:13px;margin-top:5px;">BW Ratio: <strong class="${s.bbw>=1.3?'sg':'sw'}">${s.bbw||'—'}</strong><span style="color:var(--light);font-size:11px;"> target 1.3× = ${s.btgt}kg</span></div>`:'<div class="emp" style="padding:18px;">No data</div>'}
+      </div>
+      <div class="card"><div class="ct">Front Squat</div>
+        ${s.squat1||s.squat2?`${s.squat1?`<div class="br"><div class="bh"><span>Test 1</span><strong>${s.squat1}kg</strong></div><div class="pt" style="height:8px;"><div class="pf2" style="width:${Math.min(s.squat1/180*100,100)}%;background:var(--blue);height:100%;"></div></div></div>`:''} ${s.squat2?`<div class="br"><div class="bh"><span>Test 2</span><strong>${s.squat2}kg</strong></div><div class="pt" style="height:8px;"><div class="pf2" style="width:${Math.min(s.squat2/180*100,100)}%;background:var(--green2);height:100%;"></div></div></div>`:''}<div style="font-size:13px;margin-top:5px;">BW Ratio: <strong class="${s.sbw>=1.5?'sg':'sw'}">${s.sbw||'—'}</strong><span style="color:var(--light);font-size:11px;"> target 1.5× = ${s.stgt}kg</span></div>`:'<div class="emp" style="padding:18px;">No data</div>'}
+      </div>
+    </div>`;
+  setTimeout(()=>{const ctx=document.getElementById('ch-jmp');if(ctx){CH['jmp']=new Chart(ctx,{type:'bar',data:{labels:['CMJ','SJ'],datasets:[{label:'Test 1',data:[s.cmj1||0,s.sj1||0],backgroundColor:'#2563eb',borderRadius:4},{label:'Test 2',data:[s.cmj2||0,s.sj2||0],backgroundColor:'#16a34a',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,max:65,title:{display:true,text:'cm'}}},plugins:{legend:{position:'bottom'}}}});}},80);
+}
+
+function tBench(p,tb){
+  const s=p.sc,k=pk(p.position),rg=rGrade(s.run_secs,p.position);
+  const gt=p.position==='Middle 8'?RMID:R3UP;
+  const gRows=gt.map(g=>{
+    const isc=rg&&rg.l===g.l;
+    const mn=g.mn===0?'Best':`${Math.floor(g.mn/60)}:${String(g.mn%60).padStart(2,'0')}`;
+    const mx=g.mx===9999?'—':`${Math.floor(g.mx/60)}:${String(g.mx%60).padStart(2,'0')}`;
+    return `<tr style="${isc?`font-weight:700;`:''}"><td><span style="background:${g.bg};color:${g.tc};padding:2px 9px;border-radius:9px;font-size:11px;font-weight:700;">${g.l}</span></td><td>${mn}</td><td>${mx}</td><td>${isc?`<strong style="color:${g.bg};">← ${s.run_time}</strong>`:''}</td></tr>`;
+  }).join('');
+  const cb=Math.max(s.cmj1||0,s.cmj2||0)||null,sj=Math.max(s.sj1||0,s.sj2||0)||null;
+  const bj=Math.max(s.broad1||0,s.broad2||0)||null,ch=Math.max(s.chin1||0,s.chin2||0)||null;
+  const metrics=[{l:'CMJ (cm)',v:cb,t:BM['cmj_'+k]},{l:'SJ (cm)',v:sj,t:BM['sj_'+k]},{l:'Broad Jump (cm)',v:bj,t:BM['broad_'+k]},{l:'Chin Ups',v:ch,t:BM['chin_'+k]},{l:'Bench/BW',v:s.bbw,t:1.3},{l:'Squat/BW',v:s.sbw,t:1.5}];
+  const met=metrics.filter(m=>m.v&&m.v>=m.t).length,tested=metrics.filter(m=>m.v).length;
+  const mRows=metrics.map(m=>{const ok=m.v&&m.v>=m.t;const col=ok?'#16a34a':m.v?'#ca8a04':'#9ca3af';const pct=m.v?Math.min(m.v/m.t*100,130):0;
+    return `<div style="margin-bottom:12px;"><div style="display:flex;align-items:center;gap:7px;"><span style="font-size:12px;color:var(--muted);width:120px;">${m.l}</span><div style="flex:1;height:8px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;height:100%;width:${Math.min(pct,100)}%;background:${col};border-radius:4px;"></div></div><span style="font-size:12px;font-weight:700;width:38px;text-align:right;color:${col};">${m.v||'—'}</span><span style="font-size:11px;color:var(--light);width:40px;text-align:right;">/ ${m.t}</span><span style="font-size:11px;width:56px;text-align:right;">${m.v?(ok?'<span class="sg">✓ Met</span>':'<span class="sw">Below</span>'):'<span class="sn">—</span>'}</span></div></div>`;
+  }).join('');
+  // Shooting efficiency grade
+  const sd=SD[p.name];
+  const SHOT_GRADES=[{l:'Inter County',mn:1.10,mx:1.50,bg:'#14532d',tc:'#fff'},{l:'Senior',mn:1.00,mx:1.09,bg:'#16a34a',tc:'#fff'},{l:'Intermediate',mn:0.85,mx:0.99,bg:'#ca8a04',tc:'#fff'},{l:'Junior',mn:0.75,mx:0.84,bg:'#ea580c',tc:'#fff'},{l:'Junior B',mn:0.50,mx:0.74,bg:'#dc2626',tc:'#fff'}];
+  const sg=sd?SHOT_GRADES.find(g=>sd.eff>=g.mn&&sd.eff<=g.mx):null;
+  const sgRows=SHOT_GRADES.map(g=>{
+    const isc=sg&&sg.l===g.l;
+    return `<tr style="${isc?'font-weight:700;':''}"><td><span style="background:${g.bg};color:${g.tc};padding:2px 9px;border-radius:9px;font-size:11px;font-weight:700;">${g.l}</span></td><td>${g.mn.toFixed(2)}</td><td>${g.mx.toFixed(2)}</td><td>${isc?`<strong style="color:${g.bg};">← ${sd.eff.toFixed(2)}</strong>`:''}</td></tr>`;
+  }).join('');
+  tb.innerHTML=`
+    <div class="sh2">Shooting Efficiency — Level Classification</div>
+    <div class="g g2" style="margin-bottom:14px;">
+      <div class="card"><table class="tbl"><thead><tr><th>Level</th><th>From</th><th>To</th><th>Player</th></tr></thead><tbody>${sgRows}</tbody></table>${!sd?'<div style="margin-top:9px;font-size:12px;color:var(--light);">No shooting data recorded</div>':''}</div>
+      <div class="card"><div class="ct">Current Shooting Grade</div>
+        ${sg?`<div style="background:${sg.bg};color:${sg.tc};border-radius:9px;padding:16px;text-align:center;margin-bottom:11px;"><div style="font-size:26px;font-weight:700;">${sg.l}</div><div style="font-size:14px;margin-top:3px;opacity:.85;">Eff ${sd.eff.toFixed(2)} · ${sd.actual}pts from ${sd.total} shots</div></div><div style="font-size:12px;color:var(--muted);">xScore: <strong>${sd.xScore}</strong> · Actual: <strong>${sd.actual}pts</strong></div>`
+        :sd?`<div style="color:var(--light);font-size:13px;padding:14px 0;">Efficiency ${sd.eff.toFixed(2)} — outside graded range</div>`
+        :'<div style="color:var(--light);font-size:13px;padding:18px 0;text-align:center;">No shooting data recorded</div>'}
+      </div>
+    </div>
+    <div class="sh2">1.2km Run — Level Classification (${p.position==='Middle 8'?'Middle 3rd':'3 Up/Back'})</div>
+    <div class="g g2" style="margin-bottom:14px;">
+      <div class="card"><table class="tbl"><thead><tr><th>Level</th><th>From</th><th>To</th><th>Player</th></tr></thead><tbody>${gRows}</tbody></table>${!s.run_secs?'<div style="margin-top:9px;font-size:12px;color:var(--light);">No run time recorded</div>':''}</div>
+      <div class="card"><div class="ct">Current Grade</div>${rg?`<div style="background:${rg.bg};color:${rg.tc};border-radius:9px;padding:16px;text-align:center;margin-bottom:11px;"><div style="font-size:26px;font-weight:700;">${rg.l}</div><div style="font-size:13px;margin-top:3px;opacity:.85;">${s.run_time} · ${p.position}</div></div><div style="font-size:12px;color:var(--muted);">Group: <strong>${p.position==='Middle 8'?'Middle 3rd':'3 Up/Back'}</strong></div>`:'<div style="color:var(--light);font-size:13px;padding:18px 0;text-align:center;">No run time recorded</div>'}</div>
+    </div>
+    <div class="sh2">S&amp;C Benchmarks</div>
+    <div class="g g3" style="margin-bottom:13px;">
+      <div class="card met"><div class="v" style="color:#16a34a;">${met}</div><div class="l">Benchmarks Met</div></div>
+      <div class="card met"><div class="v" style="color:#ca8a04;">${tested-met}</div><div class="l">Below Target</div></div>
+      <div class="card met"><div class="v" style="color:var(--light);">${6-tested}</div><div class="l">Not Tested</div></div>
+    </div>
+    <div class="g g2">
+      <div class="card"><div class="ct">${p.position} — vs Target</div>${mRows}</div>
+      <div class="card"><div class="ct">Radar — vs Position Standard</div><div class="cw" style="height:255px;"><canvas id="ch-rad" role="img" aria-label="Radar chart"></canvas></div></div>
+    </div>`;
+  setTimeout(()=>{const ctx=document.getElementById('ch-rad');if(ctx){CH['rad']=new Chart(ctx,{type:'radar',data:{labels:['CMJ','SJ','Broad Jump','Chin Ups','Bench/BW','Squat/BW'],datasets:[{label:'Player',data:[cb?Math.round(cb/BM['cmj_'+k]*100):0,sj?Math.round(sj/BM['sj_'+k]*100):0,bj?Math.round(bj/BM['broad_'+k]*100):0,ch?Math.round(ch/BM['chin_'+k]*100):0,s.bbw?Math.round(s.bbw/1.3*100):0,s.sbw?Math.round(s.sbw/1.5*100):0],fill:true,backgroundColor:'rgba(22,163,74,.15)',borderColor:'#16a34a',pointRadius:4,pointBackgroundColor:'#16a34a'},{label:'Standard',data:[100,100,100,100,100,100],fill:false,borderColor:'#ca8a04',borderDash:[5,5],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:130,ticks:{display:false},pointLabels:{font:{size:11}}}},plugins:{legend:{display:true,position:'bottom'}}}});}},80);
+}
+
+function tUpdate(p,tb){
+  const s=p.sc;
+  tb.innerHTML=`
+    <div class="card" style="margin-bottom:11px;"><div class="ct">Update S&amp;C Data</div>
+      <div class="fg2">
+        <div class="fi"><label>Weight (kg)</label><input type="number" placeholder="${s.weight||''}"></div>
+        <div class="fi"><label>1.2km Run (mm:ss)</label><input type="text" placeholder="${s.run_time||''}"></div>
+        <div class="fi"><label>CMJ (cm)</label><input type="number" placeholder="${s.cmj2||s.cmj1||''}"></div>
+        <div class="fi"><label>SJ (cm)</label><input type="number" placeholder="${s.sj2||s.sj1||''}"></div>
+        <div class="fi"><label>SLCMJ</label><input type="text" placeholder="${s.slcmj2||s.slcmj1||'e.g. L20/R21'}"></div>
+        <div class="fi"><label>Broad Jump (cm)</label><input type="number" placeholder="${s.broad2||s.broad1||''}"></div>
+        <div class="fi"><label>Chin Ups</label><input type="number" placeholder="${s.chin2||s.chin1||''}"></div>
+        <div class="fi"><label>Bench Press (kg)</label><input type="number" placeholder="${s.bench2||s.bench1||''}"></div>
+        <div class="fi"><label>Front Squat (kg)</label><input type="number" placeholder="${s.squat2||s.squat1||''}"></div>
+      </div>
+      <div style="margin-top:11px;"><button class="btn btng" onclick="alert('Saved ✓')">Save S&amp;C Data</button></div>
+    </div>
+    <div class="card"><div class="ct">Add Match Stats</div>
+      <div class="fg2">
+        <div class="fi"><label>Opponent</label><input type="text" placeholder="e.g. Lisdoonvarna"></div>
+        <div class="fi"><label>Tackles</label><input type="number" placeholder="0"></div>
+        <div class="fi"><label>Neg. Turnovers</label><input type="number" placeholder="0"></div>
+        <div class="fi"><label>Own Kickouts</label><input type="number" placeholder="0"></div>
+        <div class="fi"><label>Opp. Kickouts Won</label><input type="number" placeholder="0"></div>
+        <div class="fi"><label>General Frees</label><input type="number" placeholder="0"></div>
+      </div>
+      <div style="margin-top:11px;"><button class="btn btng" onclick="alert('Match added ✓')">Add Match</button></div>
+    </div>`;
+}
+buildSB();showSquad();
+</script>
+</body>
+</html>
