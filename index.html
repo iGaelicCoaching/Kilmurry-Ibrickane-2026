@@ -162,29 +162,50 @@ const SHEET_ID = '1w9lBCCvOjjfWG20hp6D44IjuW_XkMOceEmaNaZFhC9s';
 
 async function fetchSheetData(tabName) {
   if (!SHEET_ID || SHEET_ID === 'YOUR_GOOGLE_SHEET_ID_HERE') return [];
-  const url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(tabName) + '&headers=1';
+  // Use CSV export with cache-busting timestamp to always get fresh data
+  const ts = Date.now();
+  const url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&sheet=' + encodeURIComponent(tabName) + '&t=' + ts;
   try {
-    const res = await fetch(url);
-    if (!res.ok) return [{_error: 'HTTP ' + res.status}];
+    const res = await fetch(url, {cache: 'no-store'});
+    if (!res.ok) return [];
     const text = await res.text();
-    const start = text.indexOf('({') + 1;
-    const end2 = text.lastIndexOf(')');
-    if (start < 1 || end2 < 0) return [{_error: 'bad_response'}];
-    const data = JSON.parse(text.substring(start, end2));
-    if (!data.table || !data.table.cols) return [];
-    const cols = data.table.cols.map(function(c) { return c.label || c.id || ''; });
-    return (data.table.rows || []).filter(function(r) {
-      return r.c && r.c.some(function(c) { return c && c.v; });
-    }).map(function(r) {
+    const lines = text.trim().split('\n');
+    if (lines.length < 2) return [];
+    // Parse CSV headers
+    const headers = parseCSVLine(lines[0]);
+    // Parse data rows
+    return lines.slice(1).map(function(line) {
+      const vals = parseCSVLine(line);
       const obj = {};
-      (r.c || []).forEach(function(cell, i) {
-        if (cols[i]) obj[cols[i]] = cell ? (cell.f || String(cell.v || '')) : '';
+      headers.forEach(function(h, i) {
+        obj[h.trim()] = (vals[i] || '').trim();
       });
       return obj;
+    }).filter(function(row) {
+      return Object.values(row).some(function(v) { return v; });
     });
   } catch(e) {
-    return [{_error: e.message}];
+    return [];
   }
+}
+
+function parseCSVLine(line) {
+  const result = [];
+  let cur = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i+1] === '"') { cur += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if (ch === ',' && !inQuotes) {
+      result.push(cur); cur = '';
+    } else {
+      cur += ch;
+    }
+  }
+  result.push(cur);
+  return result;
 }
 
 async function getPlayerNotes(name) {
