@@ -706,12 +706,12 @@ async function tProfile(p,tb){
         ia.innerHTML='';
       }
     }else{
-      const statusClass={'Active':'inj-active','Rehab':'inj-rehab','Cleared':'inj-cleared'};
-      const statusCol={'Active':'#991b1b','Rehab':'#92400e','Cleared':'#15803d'};
+      const statusClass={'Active':'inj-active','Rehab':'inj-rehab','Cleared':'inj-cleared','Inactive':'inj-rehab'};
+      const statusCol={'Active':'#991b1b','Rehab':'#92400e','Cleared':'#15803d','Inactive':'#5f6b7a'};
       ia.innerHTML=injuries.map(inj=>{
         const s2=inj['Status']||'Unknown';
-        const sc=statusClass[s2]||'inj-cleared';
-        const col=statusCol[s2]||'#5f6b7a';
+        const sc=statusClass[s2]||(s2.toLowerCase().includes('active')?'inj-active':s2.toLowerCase().includes('clear')?'inj-cleared':'inj-rehab');
+        const col=statusCol[s2]||(s2.toLowerCase().includes('active')?'#991b1b':s2.toLowerCase().includes('clear')?'#15803d':'#92400e');
         return `<div class="inj-card ${sc}">
           <span class="inj-status" style="background:${col}20;color:${col};border:1px solid ${col}40;">${s2}</span>
           <div style="font-size:14px;font-weight:700;">${inj['Injury Type']||'Injury'}</div>
